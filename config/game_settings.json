@@ -1,0 +1,21 @@
+{
+  "victory_points_to_win": 10,
+  "max_players": 6,
+  "min_players": 2,
+  "player_colors": ["red", "green", "yellow", "white", "blue", "purple"],
+  "building_costs": {
+    "settlement": {"wood": 1, "brick": 1, "sheep": 1, "wheat": 1},
+    "city": {"wheat": 2, "ore": 3},
+    "road": {"wood": 1, "brick": 1},
+    "development_card": {"sheep": 1, "wheat": 1, "ore": 1}
+  },
+  "trade_ratios": {
+    "bank_default": 4,
+    "generic_port": 3,
+    "specific_port": 2
+  },
+  "max_hand_size": 7,
+  "robber_number": 7,
+  "initial_setup": true,
+  "map_template": "standard_3_4_player"
+}

@@ -1,0 +1,22 @@
+{
+  "small_2_player": {
+    "hexes": 13,
+    "water_ring": false,
+    "description": "Small 2 player board"
+  },
+  "standard_3_4_player": {
+    "hexes": 19,
+    "water_ring": true,
+    "description": "Standard 3-4 player board (default)"
+  },
+  "extended_5_6_player": {
+    "hexes": 37,
+    "water_ring": true,
+    "description": "Extended 5-6 player board"
+  },
+  "large_7_8_player": {
+    "hexes": 37,
+    "water_ring": true,
+    "description": "Large 7-8 player board"
+  }
+}
