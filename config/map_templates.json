@@ -1,22 +1,95 @@
 {
-  "small_2_player": {
-    "hexes": 13,
-    "water_ring": false,
-    "description": "Small 2 player board"
-  },
-  "standard_3_4_player": {
-    "hexes": 19,
-    "water_ring": true,
-    "description": "Standard 3-4 player board (default)"
-  },
-  "extended_5_6_player": {
-    "hexes": 37,
-    "water_ring": true,
-    "description": "Extended 5-6 player board"
-  },
-  "large_7_8_player": {
-    "hexes": 37,
-    "water_ring": true,
-    "description": "Large 7-8 player board"
+  "map_templates": {
+    "small_2_player": {
+      "name": "Small (2 Player)",
+      "board_layout": "hexagonal",
+      "hexes": 13,
+      "water_ring": false,
+      "description": "Small 2 player board",
+      "hex_distribution": {
+        "wood": 2,
+        "brick": 2,
+        "sheep": 2,
+        "wheat": 2,
+        "ore": 2,
+        "desert": 1
+      },
+      "number_tokens": [2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12],
+      "ports": []
+    },
+    "standard_3_4_player": {
+      "name": "Standard (3-4 Player)",
+      "board_layout": "hexagonal",
+      "hexes": 19,
+      "water_ring": true,
+      "description": "Standard 3-4 player board (default)",
+      "hex_distribution": {
+        "wood": 4,
+        "brick": 3,
+        "sheep": 4,
+        "wheat": 4,
+        "ore": 3,
+        "desert": 1
+      },
+      "number_tokens": [2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12],
+      "ports": [
+        {"type": "generic", "location": 0},
+        {"type": "wood", "location": 1},
+        {"type": "brick", "location": 2},
+        {"type": "sheep", "location": 3},
+        {"type": "wheat", "location": 4},
+        {"type": "ore", "location": 5}
+      ]
+    },
+    "extended_5_6_player": {
+      "name": "Extended (5-6 Player)",
+      "board_layout": "hexagonal",
+      "hexes": 37,
+      "water_ring": true,
+      "description": "Extended 5-6 player board",
+      "hex_distribution": {
+        "wood": 6,
+        "brick": 6,
+        "sheep": 6,
+        "wheat": 6,
+        "ore": 6,
+        "desert": 1
+      },
+      "number_tokens": [2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12],
+      "ports": [
+        {"type": "generic", "location": 0},
+        {"type": "generic", "location": 1},
+        {"type": "wood", "location": 2},
+        {"type": "brick", "location": 3},
+        {"type": "sheep", "location": 4},
+        {"type": "wheat", "location": 5},
+        {"type": "ore", "location": 6}
+      ]
+    },
+    "large_7_8_player": {
+      "name": "Large (7-8 Player)",
+      "board_layout": "hexagonal",
+      "hexes": 37,
+      "water_ring": true,
+      "description": "Large 7-8 player board",
+      "hex_distribution": {
+        "wood": 6,
+        "brick": 6,
+        "sheep": 6,
+        "wheat": 6,
+        "ore": 6,
+        "desert": 1
+      },
+      "number_tokens": [2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12],
+      "ports": [
+        {"type": "generic", "location": 0},
+        {"type": "generic", "location": 1},
+        {"type": "wood", "location": 2},
+        {"type": "brick", "location": 3},
+        {"type": "sheep", "location": 4},
+        {"type": "wheat", "location": 5},
+        {"type": "ore", "location": 6}
+      ]
+    }
   }
 }

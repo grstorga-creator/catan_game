@@ -17,5 +17,9 @@
   "max_hand_size": 7,
   "robber_number": 7,
   "initial_setup": true,
-  "map_template": "standard_3_4_player"
+  "map_settings": {
+    "map_size": "standard_3_4_player",
+    "hexes": 19,
+    "water_ring": true
+  }
 }
