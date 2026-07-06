@@ -1,5 +1,10 @@
 {
-  "victory_points_to_win": 10,
+  "game_variant": "nodknaKra",
+  "victory_points_3_player": 17,
+  "victory_points_4_player": 15,
+  "victory_points_5_player": 12,
+  "victory_points_6_player": 10,
+  "victory_margin": 2,
   "max_players": 6,
   "min_players": 2,
   "player_colors": ["red", "green", "yellow", "white", "blue", "purple"],
@@ -16,10 +21,10 @@
   },
   "max_hand_size": 7,
   "robber_number": 7,
-  "initial_setup": true,
-  "map_settings": {
-    "map_size": "standard_3_4_player",
-    "hexes": 19,
-    "water_ring": true
+  "board_hexes": 37,
+  "optional_rules": {
+    "no_attack_first_turn": true,
+    "no_monopoly_same_turn_as_trade": true,
+    "touch_move": false
   }
 }
