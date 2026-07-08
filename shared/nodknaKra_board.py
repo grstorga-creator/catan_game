@@ -1,6 +1,11 @@
 """
-NodKnaKra Board Generation
-Creates a 37-hex board (36 terrain + 1 desert) with ports and balanced number tokens.
+Project: NodKnaKra Settlers of Catan
+File: nodknaKra_board.py
+Created: 2026-07-08
+
+EDIT HISTORY (most recent first):
+2026-07-08 - Gordon - Added file header with edit history tracking; rebuilt for scalable row-based layout
+2026-07-08 - Gordon - Created NodKnaKraBoard with row-based hex generation (6-7-8-7-6 default)
 """
 
 import random
@@ -80,27 +85,53 @@ class Hex:
 
 
 class NodKnaKraBoard:
-    """Generates and manages a 37-hex NodKnaKra board"""
+    """Generates scalable row-based hexagon boards"""
     
-    def __init__(self, seed: Optional[int] = None):
+    BOARD_SIZES = {
+        'small': [5, 6, 7, 6, 5],
+        'standard': [6, 7, 8, 7, 6],
+        'large': [7, 8, 9, 8, 7],
+        'xlarge': [5, 6, 7, 8, 7, 6, 5]
+    }
+    
+    def __init__(self, row_pattern: Optional[List[int]] = None, seed: Optional[int] = None):
         """Initialize board generator"""
         if seed is not None:
             random.seed(seed)
         
+        self.row_pattern = row_pattern or self.BOARD_SIZES['standard']
+        self.num_rows = len(self.row_pattern)
+        self.total_hexes = sum(self.row_pattern)
+        
+        self.terrain_counts = self._calculate_terrain_distribution()
+        self.available_numbers = [2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12]
+        
         self.hexes: Dict[HexCoord, Hex] = {}
-        self.terrain_counts = {
-            Terrain.WOOD: 7,
-            Terrain.BRICK: 7,
-            Terrain.SHEEP: 7,
-            Terrain.WHEAT: 7,
-            Terrain.ORE: 8,
+    
+    def _calculate_terrain_distribution(self) -> Dict[Terrain, int]:
+        """Calculate proportional terrain distribution based on board size"""
+        hexes_without_desert = self.total_hexes - 1
+        hexes_per_resource = hexes_without_desert // 5
+        remainder = hexes_without_desert % 5
+    
+        distribution = {
+            Terrain.WOOD: hexes_per_resource,
+            Terrain.BRICK: hexes_per_resource,
+            Terrain.SHEEP: hexes_per_resource,
+            Terrain.WHEAT: hexes_per_resource,
+            Terrain.ORE: hexes_per_resource,
             Terrain.DESERT: 1
         }
-        self.available_numbers = [2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12]
+    
+        resources = [Terrain.WOOD, Terrain.BRICK, Terrain.SHEEP, Terrain.WHEAT, Terrain.ORE]
+        for i in range(remainder):
+            distribution[resources[i]] += 1
+    
+        return distribution
     
     def generate(self) -> Dict[HexCoord, Hex]:
         """Generate a complete board"""
-        coords = self._generate_hex_ring()
+        coords = self._generate_hex_coordinates()
         terrains = self._create_terrain_distribution()
         
         random.shuffle(coords)
@@ -113,18 +144,18 @@ class NodKnaKraBoard:
         
         return self.hexes
     
-    def _generate_hex_ring(self) -> List[HexCoord]:
-        """Generate 37 hexes in concentric rings"""
+    def _generate_hex_coordinates(self) -> List[HexCoord]:
+        """Generate hex coordinates for row-based layout"""
         coords = []
-        coords.append(HexCoord(0, 0))  # Center
+        middle_row = self.num_rows // 2
         
-        for distance in range(1, 4):
-            # Generate all hexes at this distance
-            for q in range(-distance, distance + 1):
-                for r in range(-distance, distance + 1):
-                    s = -q - r
-                    if max(abs(q), abs(r), abs(s)) == distance:
-                        coords.append(HexCoord(q, r))
+        for row_idx, row_width in enumerate(self.row_pattern):
+            offset = abs(middle_row - row_idx)
+            
+            for col in range(row_width):
+                q = col - offset
+                r = row_idx - middle_row
+                coords.append(HexCoord(q, r))
         
         return coords
     
@@ -165,7 +196,7 @@ class NodKnaKraBoard:
                                     break
     
     def _place_ports(self):
-        """Place ports around the edge"""
+        """Place ports on edge hexes"""
         port_assignments = [
             PortType.GENERIC,
             PortType.WOOD,
@@ -192,10 +223,10 @@ class NodKnaKraBoard:
         return edge_hexes
     
     def print_board(self):
-        """Print the board"""
-        print("\n" + "="*60)
-        print("NodKnaKra Board (37 Hexes)")
-        print("="*60)
+        """Print the board in row format"""
+        print("\n" + "="*70)
+        print(f"NodKnaKra Board - Rows: {self.row_pattern} ({self.total_hexes} hexes)")
+        print("="*70)
         
         rows = {}
         for coord, hex_obj in self.hexes.items():
@@ -205,17 +236,17 @@ class NodKnaKraBoard:
         
         for r in sorted(rows.keys()):
             row_hexes = sorted(rows[r], key=lambda x: x[0].q)
-            padding = " " * (3 - r) if r < 3 else ""
-            row_str = padding + "  ".join([
+            spaces = " " * (abs(r - (self.num_rows // 2)) * 2)
+            row_str = spaces + "  ".join([
                 f"{hex_obj.terrain.value[:3].upper()}{hex_obj.number_token}" if hex_obj.number_token > 0 
                 else f"{hex_obj.terrain.value[:3].upper()}"
                 for _, hex_obj in row_hexes
             ])
             print(row_str)
         
-        print("\n" + "="*60)
+        print("\n" + "="*70)
         print("Terrain Summary:")
-        print("="*60)
+        print("="*70)
         
         terrain_counts = {}
         for hex_obj in self.hexes.values():
@@ -227,25 +258,28 @@ class NodKnaKraBoard:
             count = terrain_counts[terrain]
             print(f"  {terrain.value.upper()}: {count}")
         
-        print("\n" + "="*60 + "\n")
+        print("="*70 + "\n")
     
     def print_stats(self):
         """Print board statistics"""
         print("Board Statistics:")
-        print(f"Total hexes: {len(self.hexes)}")
-        print(f"Land hexes: {len([h for h in self.hexes.values() if h.terrain != Terrain.DESERT])}")
-        print(f"Number tokens: {len([h for h in self.hexes.values() if h.number_token > 0])}\n")
+        print(f"  Total hexes: {self.total_hexes}")
+        print(f"  Rows: {self.row_pattern}")
+        print(f"  Land hexes: {len([h for h in self.hexes.values() if h.terrain != Terrain.DESERT])}")
+        print(f"  Number tokens: {len([h for h in self.hexes.values() if h.number_token > 0])}")
+        print()
 
 
 if __name__ == "__main__":
-    print("\nTesting NodKnaKra Board Generation...\n")
+    print("\nTesting NodKnaKra Scalable Board Generation...\n")
     
-    board = NodKnaKraBoard(seed=42)
-    hexes = board.generate()
+    for size_name in ['small', 'standard', 'large']:
+        size_pattern = NodKnaKraBoard.BOARD_SIZES[size_name]
+        board = NodKnaKraBoard(row_pattern=size_pattern, seed=42)
+        hexes = board.generate()
+        
+        print(f"\n{size_name.upper()} Board ({board.total_hexes} hexes):")
+        board.print_board()
+        board.print_stats()
     
-    print(f"✓ Generated board with {len(hexes)} hexes")
-    
-    board.print_board()
-    board.print_stats()
-    
-    print("✓ Board generation working!")
+    print("✓ All board sizes working!")
