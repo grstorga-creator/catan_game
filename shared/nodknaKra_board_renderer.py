@@ -4,6 +4,7 @@ File: nodknaKra_board_renderer.py
 Created: 2026-07-08
 
 EDIT HISTORY (most recent first):
+2026-07-09 - Gordon - Fixed coordinate calculation to match board generator's q range (min_q = -offset)
 2026-07-08 - Gordon - Fixed offset calculation based on row width difference from center row
 2026-07-08 - Gordon - Fixed row centering: shift odd rows LEFT for proper symmetrical honeycomb
 2026-07-08 - Gordon - Changed to pointy-top hexagon orientation with proper interlocking spacing
@@ -60,14 +61,14 @@ class BoardRenderer:
         r = hex_coord.r
         
         # Pointy-top hex spacing
-        hex_width = self.hex_size * math.sqrt(3)      # Horizontal spacing
-        hex_height = self.hex_size * 2                # Vertical spacing between hex centers
+        hex_width = self.hex_size * math.sqrt(3)
+        row_height = self.hex_size * 2
         
         # Center of screen
         center_x = self.width // 2
         center_y = self.height // 2
         
-        # Get row width for this row
+        # Get row info
         middle_row = len(self.row_pattern) // 2
         row_idx = r + middle_row
         if 0 <= row_idx < len(self.row_pattern):
@@ -75,20 +76,21 @@ class BoardRenderer:
         else:
             row_width = 0
         
+        # Calculate the offset that the board generator uses
+        # This determines the q range for this row
+        offset = abs(middle_row - row_idx)
+        
+        # The actual q values go from -offset to (row_width - offset - 1)
+        min_q = -offset
+        max_q = row_width - offset - 1
+        center_q = (min_q + max_q) / 2.0
+        
         # Calculate vertical position
-        y = center_y + (r * hex_height * 0.75)  # 0.75 for proper interlocking
+        y = center_y + (r * row_height * 0.75)
         
-        # Get center row width (widest row)
-        center_row_idx = len(self.row_pattern) // 2
-        center_row_width = self.row_pattern[center_row_idx]
-        
-        # Calculate offset based on width difference from center row
-        # If this row is narrower, it needs to be offset to stay centered
-        width_diff = center_row_width - row_width
-        x_offset = width_diff * hex_width / 2
-        
-        # Position this row centered
-        row_center = center_x - (row_width - 1) * hex_width / 2 - x_offset
+        # Calculate horizontal position
+        # Position relative to the center of this row's q range
+        row_center = center_x - center_q * hex_width
         x = row_center + q * hex_width
         
         return (int(x), int(y))
