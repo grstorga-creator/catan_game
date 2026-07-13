@@ -57,7 +57,7 @@ class BoardRenderer:
         
         self.font_large = pygame.font.Font(None, 32)
         self.font_small = pygame.font.Font(None, 24)
-        self.font_tiny = pygame.font.Font(None, 16)
+        self.font_tiny = pygame.font.Font(None, 20)  # Increased from 16 for port labels
         
         self.clock = pygame.time.Clock()
         self.running = True
@@ -73,20 +73,35 @@ class BoardRenderer:
         center_x = self.width // 2
         center_y = self.height // 2
         
+        # Get row info
         middle_row = len(self.row_pattern) // 2
         row_idx = r + middle_row
-        if 0 <= row_idx < len(self.row_pattern):
-            row_width = self.row_pattern[row_idx]
-        else:
-            row_width = 0
         
-        offset = abs(middle_row - row_idx)
-        
-        min_q = -offset
-        max_q = row_width - offset - 1
-        center_q = (min_q + max_q) / 2.0
-        
+        # Calculate vertical position
         y = center_y + (r * row_height * 0.75)
+        
+        # Handle special water rows (outside row_pattern)
+        if r == -middle_row - 1:
+            # Top water row (r=-3 for standard board)
+            # 7 hexes: q from -3 to 3
+            center_q = 0.0
+        elif r == middle_row + 1:
+            # Bottom water row (r=3 for standard board)
+            # 7 hexes: q from -3 to 3 (mirrors top row)
+            center_q = 0.0
+        elif 0 <= row_idx < len(self.row_pattern):
+            # Normal land or middle water rows
+            row_width = self.row_pattern[row_idx]
+            offset = abs(middle_row - row_idx)
+            
+            min_q = -offset
+            max_q = row_width - offset - 1
+            center_q = (min_q + max_q) / 2.0
+        else:
+            # Fallback
+            center_q = 0.0
+        
+        # Calculate horizontal position
         row_center = center_x - center_q * hex_width
         x = row_center + q * hex_width
         
@@ -123,24 +138,22 @@ class BoardRenderer:
         self.screen.blit(text, text_rect)
     
     def draw_port_indicator(self, center: Tuple[int, int], port_type: str):
-        """Draw port indicator on water hex"""
-        # Draw small circle in corner of hex
-        indicator_radius = 8
-        indicator_x = int(center[0] + self.hex_size * 0.65)
-        indicator_y = int(center[1] - self.hex_size * 0.65)
+        """Draw port indicator centered on water hex"""
+        # Draw large circle centered on hex
+        indicator_radius = 20
         
         port_color = self.PORT_COLORS.get(port_type, (255, 255, 255))
-        pygame.draw.circle(self.screen, port_color, (indicator_x, indicator_y), indicator_radius)
-        pygame.draw.circle(self.screen, self.COLOR_BORDER, (indicator_x, indicator_y), indicator_radius, 2)
+        pygame.draw.circle(self.screen, port_color, (int(center[0]), int(center[1])), indicator_radius)
+        pygame.draw.circle(self.screen, self.COLOR_BORDER, (int(center[0]), int(center[1])), indicator_radius, 2)
         
-        # Draw ratio text
+        # Draw ratio text centered
         if port_type == 'generic':
             ratio_text = "3:1"
         else:
             ratio_text = "2:1"
         
-        text = self.font_tiny.render(ratio_text, True, self.COLOR_NUMBER)
-        text_rect = text.get_rect(center=(indicator_x, indicator_y))
+        text = self.font_small.render(ratio_text, True, (0, 0, 0))
+        text_rect = text.get_rect(center=center)
         self.screen.blit(text, text_rect)
     
     def draw_board(self, all_hexes: Dict):
@@ -185,8 +198,8 @@ class BoardRenderer:
         pygame.display.flip()
     
     def draw_legend(self):
-        """Draw terrain and port legend"""
-        legend_x = self.width - 240
+        """Draw terrain and port legend on the LEFT side"""
+        legend_x = 20  # Left side instead of right
         legend_y = 20
         box_size = 15
         spacing = 22
