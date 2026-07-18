@@ -29,6 +29,25 @@ TOKEN_DISTRIBUTIONS = {
     },
 }
 
+# Harbor types
+HARBOR_SPECIFICS = [
+    HarborType.WOOD_2_1,
+    HarborType.BRICK_2_1,
+    HarborType.SHEEP_2_1,
+    HarborType.SHEEP_2_1,  # Two sheep ports
+    HarborType.WHEAT_2_1,
+    HarborType.ORE_2_1,
+]
+
+HARBOR_GENERIC = [
+    HarborType.GENERIC_3_1,
+    HarborType.GENERIC_3_1,
+    HarborType.GENERIC_3_1,
+    HarborType.GENERIC_3_1,
+    HarborType.GENERIC_3_1,
+    HarborType.GENERIC_3_1,
+]
+
 
 class GameHex:
     """An actual game hex with all properties"""
@@ -57,6 +76,7 @@ class Board:
         self._load_map()
         self._randomize_terrain()
         self._distribute_tokens()
+        self._assign_harbors()
     
     def _load_map(self):
         """Load hexes from map configuration"""
@@ -124,6 +144,86 @@ class Board:
         print(f"[DEBUG] Distributed {len(tokens)} tokens to {len(terrain_positions)} terrain hexes")
         print(f"[DEBUG] Token distribution: {dict(zip(token_values, token_counts))}")
     
+    def _assign_harbors(self):
+        """Assign harbors to water hexes in alternating pattern"""
+        # Get water hexes in perimeter order
+        water_hexes = self.get_water_hexes()
+        perimeter_hexes = self._get_perimeter_water_hexes(water_hexes)
+        
+        if len(perimeter_hexes) < 8:
+            print(f"[WARNING] Perimeter too small ({len(perimeter_hexes)} hexes), skipping harbors")
+            return
+        
+        print(f"[DEBUG] Perimeter water hexes ({len(perimeter_hexes)}): {perimeter_hexes}")
+        
+        # Shuffle specific 2:1 harbors
+        specific_harbors = HARBOR_SPECIFICS.copy()
+        random.shuffle(specific_harbors)
+        
+        # Shuffle generic 3:1 harbors
+        generic_harbors = HARBOR_GENERIC.copy()
+        random.shuffle(generic_harbors)
+        
+        # Apply alternating pattern: 2:1, plain, 3:1, plain, repeat
+        harbor_idx_specific = 0
+        harbor_idx_generic = 0
+        
+        for i, water_hex_pos in enumerate(perimeter_hexes):
+            water_hex = self.hexes[water_hex_pos]
+            
+            if i % 4 == 0:  # 2:1 harbor
+                if harbor_idx_specific < len(specific_harbors):
+                    water_hex.harbor = specific_harbors[harbor_idx_specific]
+                    print(f"[DEBUG] Position {i} ({water_hex_pos}): {water_hex.harbor.value}")
+                    harbor_idx_specific += 1
+            elif i % 4 == 2:  # 3:1 harbor
+                if harbor_idx_generic < len(generic_harbors):
+                    water_hex.harbor = generic_harbors[harbor_idx_generic]
+                    print(f"[DEBUG] Position {i} ({water_hex_pos}): {water_hex.harbor.value}")
+                    harbor_idx_generic += 1
+            else:
+                print(f"[DEBUG] Position {i} ({water_hex_pos}): plain water")
+        
+        print(f"[DEBUG] Assigned {harbor_idx_specific} specific 2:1 harbors (of {len(specific_harbors)} available)")
+        print(f"[DEBUG] Assigned {harbor_idx_generic} generic 3:1 harbors (of {len(generic_harbors)} available)")
+    
+    def _get_perimeter_water_hexes(self, water_hexes: List[GameHex]) -> List[str]:
+        """Get water hexes in perimeter order (clockwise from top-left)"""
+        # For Standard map: 
+        # Row A: all 7 (top)
+        # Rows B-F: just left and right edges
+        # Row G: all 7 (bottom)
+        
+        perimeter = []
+        
+        # Top row (A) - left to right
+        row_a = sorted([h for h in water_hexes if h.position[0] == 'A'], 
+                      key=lambda h: int(h.position[1:]))
+        perimeter.extend([h.position for h in row_a])
+        
+        # Right side - going down (B7, B8, C9, D10, E9, F8)
+        # These are rightmost water hexes of each middle row
+        for row_letter in ['B', 'C', 'D', 'E', 'F']:
+            row_hexes = [h for h in water_hexes if h.position[0] == row_letter]
+            if row_hexes:
+                rightmost = max(row_hexes, key=lambda h: int(h.position[1:]))
+                perimeter.append(rightmost.position)
+        
+        # Bottom row (G) - right to left
+        row_g = sorted([h for h in water_hexes if h.position[0] == 'G'], 
+                      key=lambda h: int(h.position[1:]), reverse=True)
+        perimeter.extend([h.position for h in row_g])
+        
+        # Left side - going up (F1, E1, D2, C1, B1)
+        # These are leftmost water hexes of each middle row (going up)
+        for row_letter in ['F', 'E', 'D', 'C', 'B']:
+            row_hexes = [h for h in water_hexes if h.position[0] == row_letter]
+            if row_hexes:
+                leftmost = min(row_hexes, key=lambda h: int(h.position[1:]))
+                perimeter.append(leftmost.position)
+        
+        return perimeter
+    
     def get_hex(self, position: str) -> GameHex:
         """Get hex by position"""
         return self.hexes.get(position)
@@ -167,9 +267,27 @@ class Board:
             hex_display = []
             for pos, hex_obj in hex_list:
                 if hex_obj.hex_type == HexType.WATER:
-                    hex_display.append("~  ")
+                    # Water hex with optional harbor
+                    if hex_obj.harbor and hex_obj.harbor.value:
+                        harbor_val = hex_obj.harbor.value
+                        # Shorten harbor name for display
+                        if "3:1" in harbor_val:
+                            harbor_str = "3:1"
+                        elif "2:1" in harbor_val:
+                            # Extract resource letter from "Wood 2:1", "Ore 2:1", etc.
+                            parts = harbor_val.split()
+                            if len(parts) >= 1:
+                                resource = parts[0][0]  # First letter of resource
+                                harbor_str = f"{resource}:1"
+                            else:
+                                harbor_str = "?:1"
+                        else:
+                            harbor_str = "?:?"
+                        hex_display.append(f"~({harbor_str:3})")
+                    else:
+                        hex_display.append("~    ")
                 elif hex_obj.hex_type == HexType.DESERT:
-                    hex_display.append("D  ")
+                    hex_display.append("D    ")
                 else:
                     # Terrain with token
                     terrain_char = hex_obj.hex_type.value[0]
@@ -185,6 +303,7 @@ class Board:
         print(f"\nTerrain hexes: {len(self.get_terrain_hexes())}")
         print(f"Desert hexes: 1")
         print(f"Water hexes: {len(self.get_water_hexes())}")
+        print(f"Harbor hexes: {len([h for h in self.get_water_hexes() if h.harbor])}")
         print(f"Total hexes: {len(self.hexes)}\n")
 
 

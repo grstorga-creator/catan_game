@@ -103,6 +103,30 @@ class HexRenderer:
                 token_text = self.font.render(str(hex_obj.number_token), True, token_color)
                 token_rect = token_text.get_rect(center=position)
                 self.screen.blit(token_text, token_rect)
+        
+        # For water hexes: draw harbor if present
+        if hex_obj.hex_type == HexType.WATER and hex_obj.harbor is not None:
+            harbor_val = hex_obj.harbor.value
+            
+            if "3:1" in harbor_val:
+                # Generic 3:1 - single line
+                harbor_text = self.font.render("3-1", True, (255, 255, 255))
+                harbor_rect = harbor_text.get_rect(center=position)
+                self.screen.blit(harbor_text, harbor_rect)
+            elif "2:1" in harbor_val:
+                # Specific 2:1 - two lines
+                # Extract resource name (e.g., "Wheat" from "Wheat 2:1")
+                resource = harbor_val.split()[0]
+                
+                # Draw resource name on top
+                resource_text = self.font.render(resource, True, (255, 255, 255))
+                resource_rect = resource_text.get_rect(center=(position[0], position[1] - 8))
+                self.screen.blit(resource_text, resource_rect)
+                
+                # Draw 2-1 on bottom
+                ratio_text = self.font.render("2-1", True, (255, 255, 255))
+                ratio_rect = ratio_text.get_rect(center=(position[0], position[1] + 8))
+                self.screen.blit(ratio_text, ratio_rect)
     
     def render_board(self, game: Game):
         """Render the complete board"""
@@ -154,6 +178,19 @@ class HexRenderer:
                 # Draw label
                 label = self.font.render(f"  {name}", True, self.TEXT_COLOR)
                 self.screen.blit(label, (legend_x + 25, y - 12))
+            
+            # Harbor legend
+            harbor_legend_y = legend_y + len(legend_items) * 30 + 15
+            harbor_label = self.font.render("Harbors:", True, self.TEXT_COLOR)
+            self.screen.blit(harbor_label, (legend_x, harbor_legend_y))
+            
+            harbor_items = [
+                "2:1 Specific (W,B,S,T,O)",
+                "3:1 Generic",
+            ]
+            for i, harbor_text in enumerate(harbor_items):
+                label = self.font.render(harbor_text, True, self.TEXT_COLOR)
+                self.screen.blit(label, (legend_x + 10, harbor_legend_y + 25 + i * 20))
             
             # Draw instructions
             instructions = self.font.render("Press ESC to exit", True, self.TEXT_COLOR)
