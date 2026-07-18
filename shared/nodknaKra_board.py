@@ -67,10 +67,13 @@ class Hex:
 
 class NodKnaKraBoard:
     BOARD_SIZES = {
-        'small': [5, 6, 7, 6, 5],
-        'standard': [6, 7, 8, 7, 6],
-        'large': [7, 8, 9, 8, 7],
-        'xlarge': [5, 6, 7, 8, 7, 6, 5]
+        'ultra_small': [2, 3, 4, 3, 2],     # 14 land, 16 water
+        'micro': [3, 4, 5, 4, 3],          # 19 land, 18 water
+        'small': [5, 6, 7, 6, 5],          # 29 land, 22 water
+        'standard': [6, 7, 8, 7, 6],       # 34 land, 24 water ← Current
+        'large': [8, 9, 10, 9, 8],         # 44 land, 28 water
+        'xlarge': [9, 10, 11, 10, 9],      # 49 land, 30 water
+        'ultra_large': [10, 11, 12, 11, 10]  # 54 land, 32 water
     }
     
     def __init__(self, row_pattern: Optional[List[int]] = None, seed: Optional[int] = None):
@@ -82,9 +85,9 @@ class NodKnaKraBoard:
         self.total_hexes = sum(self.row_pattern)
         
         self.terrain_counts = self._calculate_terrain_distribution()
-        # Number token distribution for 34-hex board:
-        # 1×2, 2×3, 4×4, 5×5, 5×6, 5×8, 4×9, 4×10, 2×11, 1×12 = 33 tokens (34 - 1 desert)
-        self.available_numbers = [2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 8, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 11, 11, 12]
+        
+        # Calculate token distribution dynamically based on board size
+        self.available_numbers = self._calculate_token_distribution()
         
         self.hexes: Dict[HexCoord, Hex] = {}
         self.water_hexes: Dict[HexCoord, Hex] = {}
@@ -111,6 +114,60 @@ class NodKnaKraBoard:
             col_num = coord.q + offset + 2
         
         return f"{row_letter}{col_num}"
+    
+    def _calculate_token_distribution(self) -> List[int]:
+        """
+        Calculate token distribution dynamically based on board size.
+        Keeps endpoints (1×2, 1×12) constant and scales middle values proportionally.
+        """
+        # Standard distribution for 33 tokens (Standard board: 34 land - 1 desert)
+        # Counts by token value: 2, 3, 4, 5, 6, 8, 9, 10, 11, 12
+        STANDARD_COUNTS = [1, 2, 4, 5, 5, 5, 4, 4, 2, 1]  # Total = 33
+        TOKEN_VALUES = [2, 3, 4, 5, 6, 8, 9, 10, 11, 12]
+        
+        # Calculate tokens needed for this board (land hexes - 1 desert)
+        tokens_needed = self.total_hexes - 1
+        
+        # If exact standard size, use standard distribution
+        if tokens_needed == 33:
+            tokens = []
+            for value, count in zip(TOKEN_VALUES, STANDARD_COUNTS):
+                tokens.extend([value] * count)
+            return tokens
+        
+        # Scale from standard
+        ratio = tokens_needed / 33.0
+        
+        # Scale counts (keep endpoints locked)
+        scaled_counts = []
+        for i, count in enumerate(STANDARD_COUNTS):
+            if i == 0 or i == 9:
+                # Keep endpoints (2 and 12) at 1 each
+                scaled_counts.append(1)
+            else:
+                # Scale middle values and round
+                scaled_counts.append(max(1, int(round(count * ratio))))
+        
+        # Adjust to hit exact target
+        total_scaled = sum(scaled_counts)
+        diff = tokens_needed - total_scaled
+        
+        # Adjust from the most populous middle value (usually the 6s or 8s)
+        if diff != 0:
+            # Adjust the middle-most common value (index 4 or 5, the 6 or 8s)
+            adjust_idx = 4 if scaled_counts[4] >= scaled_counts[5] else 5
+            scaled_counts[adjust_idx] += diff
+        
+        # Build final token list
+        tokens = []
+        for value, count in zip(TOKEN_VALUES, scaled_counts):
+            tokens.extend([value] * count)
+        
+        print(f"[DEBUG] Token distribution for {tokens_needed} tokens:")
+        print(f"[DEBUG] Counts: {dict(zip(TOKEN_VALUES, scaled_counts))}")
+        print(f"[DEBUG] Total: {sum(scaled_counts)}")
+        
+        return tokens
     
     def _calculate_terrain_distribution(self) -> Dict[Terrain, int]:
         hexes_without_desert = self.total_hexes - 1
