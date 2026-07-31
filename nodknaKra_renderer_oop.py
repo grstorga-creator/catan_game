@@ -128,7 +128,114 @@ class HexRenderer:
                 ratio_rect = ratio_text.get_rect(center=(position[0], position[1] + 8))
                 self.screen.blit(ratio_text, ratio_rect)
     
-    def render_board(self, game: Game):
+    def draw_vertices(self, ve_system, game: Game):
+        """Draw all vertices on the board"""
+        if not ve_system:
+            return
+        
+        # Draw vertices as small dots
+        vertex_radius = 4
+        vertex_color = (100, 100, 100)  # Dark gray
+        
+        for vertex_id, vertex in ve_system.vertices.items():
+            # Calculate vertex position from hex positions
+            pixel_x = 0
+            pixel_y = 0
+            
+            for hex_pos in vertex.hex_positions:
+                hex_pixel = self.hex_to_pixel(hex_pos)
+                pixel_x += hex_pixel[0]
+                pixel_y += hex_pixel[1]
+            
+            # Average the positions
+            pixel_x //= len(vertex.hex_positions)
+            pixel_y //= len(vertex.hex_positions)
+            
+            # Draw settlement/city if present
+            if vertex.settlement_owner is not None:
+                # Colors for players
+                player_colors = [
+                    (255, 0, 0),      # Player 1 - Red
+                    (0, 0, 255),      # Player 2 - Blue
+                    (255, 255, 0),    # Player 3 - Yellow
+                    (0, 255, 0),      # Player 4 - Green
+                ]
+                color = player_colors[vertex.settlement_owner - 1] if vertex.settlement_owner <= 4 else (128, 128, 128)
+                
+                # Draw city (filled circle) or settlement (outline circle)
+                if vertex.is_city:
+                    pygame.draw.circle(self.screen, color, (pixel_x, pixel_y), vertex_radius + 2)
+                    pygame.draw.circle(self.screen, (255, 255, 255), (pixel_x, pixel_y), vertex_radius + 2, 2)
+                else:
+                    pygame.draw.circle(self.screen, color, (pixel_x, pixel_y), vertex_radius)
+                    pygame.draw.circle(self.screen, (255, 255, 255), (pixel_x, pixel_y), vertex_radius, 2)
+            else:
+                # Empty vertex - small gray dot
+                pygame.draw.circle(self.screen, vertex_color, (pixel_x, pixel_y), vertex_radius)
+                pygame.draw.circle(self.screen, (50, 50, 50), (pixel_x, pixel_y), vertex_radius, 1)
+    
+    def draw_edges(self, ve_system, game: Game):
+        """Draw all edges on the board"""
+        if not ve_system:
+            return
+        
+        edge_color = (150, 150, 150)  # Light gray
+        edge_width = 1
+        
+        # Pre-calculate all vertex positions
+        vertex_positions = {}
+        for vertex_id, vertex in ve_system.vertices.items():
+            pixel_x = 0
+            pixel_y = 0
+            
+            for hex_pos in vertex.hex_positions:
+                hex_pixel = self.hex_to_pixel(hex_pos)
+                pixel_x += hex_pixel[0]
+                pixel_y += hex_pixel[1]
+            
+            pixel_x //= len(vertex.hex_positions)
+            pixel_y //= len(vertex.hex_positions)
+            vertex_positions[vertex_id] = (pixel_x, pixel_y)
+        
+        # Draw edges based on vertex adjacency
+        drawn_edges = set()
+        
+        for vertex_id, vertex in ve_system.vertices.items():
+            # Get adjacent vertices for this vertex
+            adjacent_vertices = ve_system.get_adjacent_vertices(vertex_id)
+            
+            for adj_vertex_id in adjacent_vertices:
+                # Create a canonical edge ID to avoid duplicates
+                edge_pair = tuple(sorted([vertex_id, adj_vertex_id]))
+                if edge_pair in drawn_edges:
+                    continue
+                drawn_edges.add(edge_pair)
+                
+                # Get pixel positions
+                p1 = vertex_positions.get(vertex_id)
+                p2 = vertex_positions.get(adj_vertex_id)
+                
+                if p1 and p2:
+                    # Check if there's a road on this edge
+                    road_color = edge_color
+                    road_width = edge_width
+                    
+                    # Find the edge object for this vertex pair (if exists)
+                    for edge_id, edge in ve_system.edges.items():
+                        if edge.road_owner is not None:
+                            player_colors = [
+                                (255, 0, 0),      # Player 1 - Red
+                                (0, 0, 255),      # Player 2 - Blue
+                                (255, 255, 0),    # Player 3 - Yellow
+                                (0, 255, 0),      # Player 4 - Green
+                            ]
+                            road_color = player_colors[edge.road_owner - 1] if edge.road_owner <= 4 else (128, 128, 128)
+                            road_width = 3
+                            break
+                    
+                    pygame.draw.line(self.screen, road_color, p1, p2, road_width)
+    
+    def render_board(self, game: Game, ve_system=None):
         """Render the complete board"""
         running = True
         
@@ -153,6 +260,14 @@ class HexRenderer:
             for position, hex_obj in board_data['hexes'].items():
                 pixel_pos = self.hex_to_pixel(position)
                 self.draw_hex(hex_obj, pixel_pos)
+            
+            # Draw edges before vertices so they appear underneath
+            if ve_system:
+                self.draw_edges(ve_system, game)
+            
+            # Draw vertices
+            if ve_system:
+                self.draw_vertices(ve_system, game)
             
             # Draw legend
             legend_x = 20
@@ -192,6 +307,26 @@ class HexRenderer:
                 label = self.font.render(harbor_text, True, self.TEXT_COLOR)
                 self.screen.blit(label, (legend_x + 10, harbor_legend_y + 25 + i * 20))
             
+            # Vertex/Edge legend
+            ve_legend_y = harbor_legend_y + 100
+            ve_label = self.font.render("Placement:", True, self.TEXT_COLOR)
+            self.screen.blit(ve_label, (legend_x, ve_legend_y))
+            
+            placement_items = [
+                ("●", (100, 100, 100), "Empty vertex"),
+                ("●", (255, 0, 0), "P1 Settlement"),
+                ("●", (0, 0, 255), "P2 Settlement"),
+                ("─", (150, 150, 150), "Road"),
+            ]
+            for i, (symbol, color, name) in enumerate(placement_items):
+                if symbol == "─":
+                    pygame.draw.line(self.screen, color, (legend_x + 10, ve_legend_y + 25 + i * 20), 
+                                   (legend_x + 30, ve_legend_y + 25 + i * 20), 2)
+                else:
+                    pygame.draw.circle(self.screen, color, (legend_x + 15, ve_legend_y + 25 + i * 20), 4)
+                label = self.font.render(f"  {name}", True, self.TEXT_COLOR)
+                self.screen.blit(label, (legend_x + 40, ve_legend_y + 15 + i * 20))
+            
             # Draw instructions
             instructions = self.font.render("Press ESC to exit", True, self.TEXT_COLOR)
             self.screen.blit(instructions, (20, self.height - 30))
@@ -205,6 +340,7 @@ class HexRenderer:
 def main():
     """Main entry point"""
     import sys
+    from nodknaKra_vertices_edges import VertexEdgeSystem
     
     # Allow map selection from command line
     map_name = sys.argv[1] if len(sys.argv) > 1 else 'standard'
@@ -216,12 +352,16 @@ def main():
     # Show ASCII representation
     game.render_ascii()
     
-    # Show visual representation
-    print(f"Rendering {map_name} map with Pygame...")
+    # Initialize vertex/edge system
+    print("Building vertex/edge placement system...")
+    ve_system = VertexEdgeSystem(game.board)
+    
+    # Show visual representation with vertices and edges
+    print(f"Rendering {map_name} map with vertices, edges, and harbors...")
     print("(Press ESC to exit)\n")
     
     renderer = HexRenderer()
-    renderer.render_board(game)
+    renderer.render_board(game, ve_system)
 
 
 if __name__ == "__main__":
