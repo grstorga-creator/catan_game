@@ -3,11 +3,14 @@ NodKnaKra Game - Loads maps, randomizes terrain, and manages board state
 """
 
 import random
-from typing import Dict, List
+from typing import Dict, List, Optional, TYPE_CHECKING
 from nodknaKra_maps_oop import (
     MapConfiguration, HexTemplate, HexType, HarborType,
     SMALL, STANDARD, LARGE
 )
+
+if TYPE_CHECKING:
+    from nodknaKra_vertices_edges import Vertex, Edge
 
 
 # Token distribution for each map size
@@ -50,7 +53,7 @@ HARBOR_GENERIC = [
 
 
 class GameHex:
-    """An actual game hex with all properties"""
+    """An actual game hex with all properties including vertex/edge references"""
     
     def __init__(self, position: str, hex_type: HexType):
         self.position = position
@@ -58,6 +61,44 @@ class GameHex:
         self.number_token = None
         self.harbor = None
         self.adjacent_terrain_positions = []
+        
+        # Vertex references (6 per hex, shared with neighbors)
+        self.vertex_top = None
+        self.vertex_top_right = None
+        self.vertex_bottom_right = None
+        self.vertex_bottom = None
+        self.vertex_bottom_left = None
+        self.vertex_top_left = None
+        
+        # Edge references (6 per hex, shared with neighbors)
+        self.edge_top_right = None    # Between TOP and TOP_RIGHT
+        self.edge_right = None         # Between TOP_RIGHT and BOTTOM_RIGHT
+        self.edge_bottom_right = None  # Between BOTTOM_RIGHT and BOTTOM
+        self.edge_bottom_left = None   # Between BOTTOM and BOTTOM_LEFT
+        self.edge_left = None          # Between BOTTOM_LEFT and TOP_LEFT
+        self.edge_top_left = None      # Between TOP_LEFT and TOP
+    
+    def get_vertices(self) -> list:
+        """Get all vertices of this hex in clockwise order from top"""
+        return [
+            self.vertex_top,
+            self.vertex_top_right,
+            self.vertex_bottom_right,
+            self.vertex_bottom,
+            self.vertex_bottom_left,
+            self.vertex_top_left,
+        ]
+    
+    def get_edges(self) -> list:
+        """Get all edges of this hex in clockwise order"""
+        return [
+            self.edge_top_right,
+            self.edge_right,
+            self.edge_bottom_right,
+            self.edge_bottom_left,
+            self.edge_left,
+            self.edge_top_left,
+        ]
     
     def __repr__(self):
         return f"Hex({self.position}, {self.hex_type.value})"
@@ -70,6 +111,12 @@ class Board:
         self.map_config = map_config
         self.hexes: Dict[str, GameHex] = {}
         
+        # Hex-graph data
+        self.vertices: Dict[str, 'Vertex'] = {}
+        self.edges: Dict[str, 'Edge'] = {}
+        self.hex_to_pixel: Dict[str, tuple] = {}
+        self.hex_to_pixel_func = None  # Will be set by renderer
+        
         if seed is not None:
             random.seed(seed)
         
@@ -77,6 +124,18 @@ class Board:
         self._randomize_terrain()
         self._distribute_tokens()
         self._assign_harbors()
+        # Hex-graph building deferred until renderer provides hex_to_pixel
+    
+    def finalize_hex_graph(self, hex_to_pixel_func):
+        """Build hex-graph using renderer's hex_to_pixel function"""
+        self.hex_to_pixel_func = hex_to_pixel_func
+        
+        # Calculate hex positions using renderer's method
+        for hex_pos in self.hexes.keys():
+            self.hex_to_pixel[hex_pos] = hex_to_pixel_func(hex_pos)
+        
+        # Now build the vertex/edge graph
+        self._build_hex_graph()
     
     def _load_map(self):
         """Load hexes from map configuration"""
@@ -84,6 +143,102 @@ class Board:
             game_hex = GameHex(template.position, template.hex_type)
             game_hex.adjacent_terrain_positions = template.adjacent_terrain_positions
             self.hexes[template.position] = game_hex
+    
+
+    def _build_hex_graph(self):
+        """Build vertices and edges using pre-calculated hex positions"""
+        from nodknaKra_vertices_edges import Vertex, Edge
+        
+        print(f"[DEBUG] Building hex-graph with geometric vertex positions...")
+        
+        hex_size = 30  # radius (must match renderer's hex_size)
+        
+        # Create all vertices with geometric positions
+        for hex_pos, (hex_x, hex_y) in self.hex_to_pixel.items():
+            game_hex = self.hexes[hex_pos]
+            
+            # Calculate 6 vertices for this hex (pointy-top orientation)
+            # Using sin/cos: top at 90°, then 60° apart clockwise
+            vertex_positions = {
+                'top': (hex_x, hex_y - hex_size),
+                'top_right': (hex_x + hex_size * 0.866, hex_y - hex_size * 0.5),
+                'bottom_right': (hex_x + hex_size * 0.866, hex_y + hex_size * 0.5),
+                'bottom': (hex_x, hex_y + hex_size),
+                'bottom_left': (hex_x - hex_size * 0.866, hex_y + hex_size * 0.5),
+                'top_left': (hex_x - hex_size * 0.866, hex_y - hex_size * 0.5),
+            }
+            
+            # Create or link to existing vertices
+            for vertex_name, (vx, vy) in vertex_positions.items():
+                # Round coordinates to avoid floating point issues
+                vx, vy = int(round(vx)), int(round(vy))
+                vertex_key = f"{vx},{vy}"
+                
+                # Check if this vertex already exists (shared with neighbor)
+                if vertex_key not in self.vertices:
+                    vertex = Vertex(
+                        vertex_id=vertex_key,
+                        pixel_x=vx,
+                        pixel_y=vy
+                    )
+                    self.vertices[vertex_key] = vertex
+                else:
+                    vertex = self.vertices[vertex_key]
+                
+                # Track which hexes touch this vertex
+                vertex.hex_positions.add(hex_pos)
+                
+                # Link vertex to hex
+                if vertex_name == 'top':
+                    game_hex.vertex_top = vertex
+                elif vertex_name == 'top_right':
+                    game_hex.vertex_top_right = vertex
+                elif vertex_name == 'bottom_right':
+                    game_hex.vertex_bottom_right = vertex
+                elif vertex_name == 'bottom':
+                    game_hex.vertex_bottom = vertex
+                elif vertex_name == 'bottom_left':
+                    game_hex.vertex_bottom_left = vertex
+                elif vertex_name == 'top_left':
+                    game_hex.vertex_top_left = vertex
+        
+        # Create edges between adjacent vertices
+        for hex_pos, game_hex in self.hexes.items():
+            vertices = game_hex.get_vertices()
+            
+            # Create edges between consecutive vertices
+            for i in range(6):
+                v1 = vertices[i]
+                v2 = vertices[(i + 1) % 6]
+                
+                if v1 and v2:
+                    # Create edge ID from vertex coordinates
+                    edge_key = f"{min(v1.vertex_id, v2.vertex_id)}-{max(v1.vertex_id, v2.vertex_id)}"
+                    
+                    if edge_key not in self.edges:
+                        edge = Edge(edge_id=edge_key, vertex1=v1, vertex2=v2)
+                        self.edges[edge_key] = edge
+                    else:
+                        edge = self.edges[edge_key]
+                    
+                    # Track which hexes touch this edge
+                    edge.hex_positions.add(hex_pos)
+                    
+                    # Link edge to hex
+                    if i == 0:
+                        game_hex.edge_top_right = edge
+                    elif i == 1:
+                        game_hex.edge_right = edge
+                    elif i == 2:
+                        game_hex.edge_bottom_right = edge
+                    elif i == 3:
+                        game_hex.edge_bottom_left = edge
+                    elif i == 4:
+                        game_hex.edge_left = edge
+                    elif i == 5:
+                        game_hex.edge_top_left = edge
+        
+        print(f"[DEBUG] Created {len(self.vertices)} vertices and {len(self.edges)} edges")
     
     def _randomize_terrain(self):
         """Randomize terrain types while keeping desert at D1"""

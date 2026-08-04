@@ -32,9 +32,9 @@ class EdgePosition(Enum):
 class Vertex:
     """A vertex (intersection point) where 2-3 hexes meet"""
     vertex_id: str
-    hex_positions: Set[str]  # Set of hex positions touching this vertex
-    pixel_x: int = 0
-    pixel_y: int = 0
+    pixel_x: int
+    pixel_y: int
+    hex_positions: Set[str] = field(default_factory=set)  # Set of hex positions touching this vertex
     settlement_owner: Optional[int] = None
     is_city: bool = False
     
@@ -47,18 +47,16 @@ class Vertex:
         return False
     
     def __repr__(self):
-        return f"Vertex({self.vertex_id})"
+        return f"Vertex({self.vertex_id} @ {self.pixel_x},{self.pixel_y})"
 
 
 @dataclass
 class Edge:
     """An edge (border between hexes) where roads are placed"""
     edge_id: str
-    hex_positions: Set[str]  # 1 or 2 hexes (1 if ocean edge)
-    pixel_x1: int = 0
-    pixel_y1: int = 0
-    pixel_x2: int = 0
-    pixel_y2: int = 0
+    vertex1: Optional['Vertex'] = None
+    vertex2: Optional['Vertex'] = None
+    hex_positions: Set[str] = field(default_factory=set)  # 1 or 2 hexes (1 if ocean edge)
     road_owner: Optional[int] = None
     
     def __hash__(self):
