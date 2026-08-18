@@ -1,0 +1,493 @@
+
+================================================================================
+NodKnaKra Board Generator - All 7 Symmetric Sizes
+================================================================================
+
+
+--------------------------------------------------------------------------------
+Generating ULTRA_SMALL board...
+--------------------------------------------------------------------------------
+[DEBUG] Generated 14 land coordinates
+[DEBUG] Land coord sample: [(-2,-2), (-1,-2), (-1,-1), (0,-1), (1,-1)]
+[DEBUG] Created 14 land hexes
+[DEBUG] Available numbers (unshuffled): [2, 3, 4, 4, 5, 5, 8, 9, 10, 12]
+[DEBUG] Number counts BEFORE: [(2, 1), (3, 1), (4, 2), (5, 2), (8, 1), (9, 1), (10, 1), (12, 1)]
+[DEBUG] Shuffled numbers: [10, 9, 5, 4, 4, 3, 8, 2, 5, 12]
+[DEBUG] Number counts AFTER assignment: [(2, 1), (3, 1), (4, 2), (5, 2), (8, 1), (9, 1), (10, 1), (12, 1)]
+[DEBUG] Total assigned: 10
+[DEBUG] Land hexes without desert: 13
+[DEBUG] Top row (r=-3): [(-2,-3), (-1,-3), (-3,-3)]
+[DEBUG] Row 0 (r=-2): left=(-3,-2), right=(0,-2)
+[DEBUG] Row 1 (r=-1): left=(-2,-1), right=(2,-1)
+[DEBUG] Row 2 (r=0): left=(-1,0), right=(4,0)
+[DEBUG] Row 3 (r=1): left=(-2,1), right=(2,1)
+[DEBUG] Row 4 (r=2): left=(-3,2), right=(0,2)
+[DEBUG] Bottom row (r=3): [(-3,3), (-2,3), (-1,3)]
+[DEBUG] Total water coords generated: 16
+[DEBUG] Generated 16 water coordinates
+[DEBUG] Water coord sample (first 6): [(-2,-3), (-1,-3), (-3,-3), (-3,-2), (0,-2), (-2,-1)]
+[DEBUG] Water coord sample (last 6): [(-3,2), (0,2), (-3,3), (-2,3), (-1,3), (0,0)]
+[DEBUG] DESERT placed at D1: (-1,0)
+[DEBUG] Created 16 water hexes
+
+[DEBUG] Hex label examples:
+[DEBUG] ROW A (r=-3, top water):
+[DEBUG]   A1: (-2,-3)
+[DEBUG]   A2: (-1,-3)
+[DEBUG]   A0: (-3,-3)
+[DEBUG] ROW D (r=0, with desert at D1 and water at D2):
+[DEBUG]   D1: (-1,0) = desert
+[DEBUG]   D2: (0,0) = ore
+[DEBUG]   D3: (0,0) = ore
+[DEBUG]   D4: (1,0) = desert
+
+[DEBUG] Port distribution (water hexes with A-G/1-x labels):
+[DEBUG]   A2: generic
+[DEBUG]   A0: sheep
+[DEBUG]   B4: sheep
+[DEBUG]   C5: generic
+[DEBUG]   D6: brick
+[DEBUG]   E5: generic
+[DEBUG]   F4: wheat
+[DEBUG]   G1: generic
+
+[DEBUG] Port summary:
+[DEBUG]   brick: 1 ports
+[DEBUG]   generic: 4 ports
+[DEBUG]   sheep: 2 ports
+[DEBUG]   wheat: 1 ports
+
+[OK] ULTRA_SMALL board generated!
+  Row pattern:    [2, 3, 4, 3, 2]
+  Land hexes:      15
+  Water hexes:     16
+  Total hexes:     30
+  Generic 3:1:      4
+  Specific 2:1:     4
+  Plain water:      8
+
+--------------------------------------------------------------------------------
+Generating MICRO board...
+--------------------------------------------------------------------------------
+[DEBUG] Generated 19 land coordinates
+[DEBUG] Land coord sample: [(-2,-2), (-1,-2), (0,-2), (-1,-1), (0,-1)]
+[DEBUG] Created 19 land hexes
+[DEBUG] Available numbers (unshuffled): [2, 3, 3, 4, 4, 5, 5, 6, 8, 8, 9, 10, 10, 11, 12]
+[DEBUG] Number counts BEFORE: [(2, 1), (3, 2), (4, 2), (5, 2), (6, 1), (8, 2), (9, 1), (10, 2), (11, 1), (12, 1)]
+[DEBUG] Shuffled numbers: [10, 8, 5, 3, 9, 10, 4, 12, 6, 2, 4, 8, 11, 5, 3]
+[DEBUG] Number counts AFTER assignment: [(2, 1), (3, 2), (4, 2), (5, 2), (6, 1), (8, 2), (9, 1), (10, 2), (11, 1), (12, 1)]
+[DEBUG] Total assigned: 15
+[DEBUG] Land hexes without desert: 18
+[DEBUG] Top row (r=-3): [(-2,-3), (-1,-3), (0,-3), (-3,-3)]
+[DEBUG] Row 0 (r=-2): left=(-3,-2), right=(1,-2)
+[DEBUG] Row 1 (r=-1): left=(-2,-1), right=(3,-1)
+[DEBUG] Row 2 (r=0): left=(-1,0), right=(5,0)
+[DEBUG] Row 3 (r=1): left=(-2,1), right=(3,1)
+[DEBUG] Row 4 (r=2): left=(-3,2), right=(1,2)
+[DEBUG] Bottom row (r=3): [(-3,3), (-2,3), (-1,3), (0,3)]
+[DEBUG] Total water coords generated: 18
+[DEBUG] Generated 18 water coordinates
+[DEBUG] Water coord sample (first 6): [(-2,-3), (-1,-3), (0,-3), (-3,-3), (-3,-2), (1,-2)]
+[DEBUG] Water coord sample (last 6): [(1,2), (-3,3), (-2,3), (-1,3), (0,3), (0,0)]
+[DEBUG] DESERT placed at D1: (-1,0)
+[DEBUG] Created 18 water hexes
+
+[DEBUG] Hex label examples:
+[DEBUG] ROW A (r=-3, top water):
+[DEBUG]   A1: (-2,-3)
+[DEBUG]   A2: (-1,-3)
+[DEBUG]   A3: (0,-3)
+[DEBUG] ROW D (r=0, with desert at D1 and water at D2):
+[DEBUG]   D1: (-1,0) = desert
+[DEBUG]   D2: (0,0) = brick
+[DEBUG]   D3: (0,0) = brick
+[DEBUG]   D4: (1,0) = wheat
+
+[DEBUG] Port distribution (water hexes with A-G/1-x labels):
+[DEBUG]   A2: generic
+[DEBUG]   A0: sheep
+[DEBUG]   B1: wood
+[DEBUG]   C1: generic
+[DEBUG]   E1: generic
+[DEBUG]   F1: wheat
+[DEBUG]   G0: generic
+[DEBUG]   G2: ore
+[DEBUG]   D2: brick
+
+[DEBUG] Port summary:
+[DEBUG]   brick: 1 ports
+[DEBUG]   generic: 4 ports
+[DEBUG]   ore: 1 ports
+[DEBUG]   sheep: 1 ports
+[DEBUG]   wheat: 1 ports
+[DEBUG]   wood: 1 ports
+
+[OK] MICRO board generated!
+  Row pattern:    [3, 4, 5, 4, 3]
+  Land hexes:      20
+  Water hexes:     18
+  Total hexes:     37
+  Generic 3:1:      4
+  Specific 2:1:     5
+  Plain water:      9
+
+--------------------------------------------------------------------------------
+Generating SMALL board...
+--------------------------------------------------------------------------------
+[DEBUG] Generated 29 land coordinates
+[DEBUG] Land coord sample: [(-2,-2), (-1,-2), (0,-2), (1,-2), (2,-2)]
+[DEBUG] Created 29 land hexes
+[DEBUG] Available numbers (unshuffled): [2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 8, 8, 8, 9, 9, 9, 10, 10, 10, 10, 11, 11, 12]
+[DEBUG] Number counts BEFORE: [(2, 1), (3, 2), (4, 4), (5, 4), (6, 4), (8, 3), (9, 3), (10, 4), (11, 2), (12, 1)]
+[DEBUG] Shuffled numbers: [5, 4, 10, 2, 6, 6, 5, 12, 8, 4, 8, 4, 10, 10, 6, 10, 11, 11, 5, 3, 3, 4, 9, 6, 9, 9, 5, 8]
+[DEBUG] Number counts AFTER assignment: [(2, 1), (3, 2), (4, 4), (5, 4), (6, 4), (8, 3), (9, 3), (10, 4), (11, 2), (12, 1)]
+[DEBUG] Total assigned: 28
+[DEBUG] Land hexes without desert: 28
+[DEBUG] Top row (r=-3): [(-2,-3), (-1,-3), (0,-3), (1,-3), (2,-3), (-3,-3)]
+[DEBUG] Row 0 (r=-2): left=(-3,-2), right=(3,-2)
+[DEBUG] Row 1 (r=-1): left=(-2,-1), right=(5,-1)
+[DEBUG] Row 2 (r=0): left=(-1,0), right=(7,0)
+[DEBUG] Row 3 (r=1): left=(-2,1), right=(5,1)
+[DEBUG] Row 4 (r=2): left=(-3,2), right=(3,2)
+[DEBUG] Bottom row (r=3): [(-3,3), (-2,3), (-1,3), (0,3), (1,3), (2,3)]
+[DEBUG] Total water coords generated: 22
+[DEBUG] Generated 22 water coordinates
+[DEBUG] Water coord sample (first 6): [(-2,-3), (-1,-3), (0,-3), (1,-3), (2,-3), (-3,-3)]
+[DEBUG] Water coord sample (last 6): [(-2,3), (-1,3), (0,3), (1,3), (2,3), (0,0)]
+[DEBUG] DESERT placed at D1: (-1,0)
+[DEBUG] Created 22 water hexes
+
+[DEBUG] Hex label examples:
+[DEBUG] ROW A (r=-3, top water):
+[DEBUG]   A1: (-2,-3)
+[DEBUG]   A2: (-1,-3)
+[DEBUG]   A3: (0,-3)
+[DEBUG] ROW D (r=0, with desert at D1 and water at D2):
+[DEBUG]   D1: (-1,0) = desert
+[DEBUG]   D2: (0,0) = brick
+[DEBUG]   D3: (0,0) = brick
+[DEBUG]   D4: (1,0) = brick
+
+[DEBUG] Port distribution (water hexes with A-G/1-x labels):
+[DEBUG]   A2: generic
+[DEBUG]   A4: wood
+[DEBUG]   A0: wheat
+[DEBUG]   B1: generic
+[DEBUG]   C1: brick
+[DEBUG]   E1: sheep
+[DEBUG]   F1: generic
+[DEBUG]   G0: ore
+[DEBUG]   G2: generic
+[DEBUG]   G4: sheep
+[DEBUG]   D2: generic
+
+[DEBUG] Port summary:
+[DEBUG]   brick: 1 ports
+[DEBUG]   generic: 5 ports
+[DEBUG]   ore: 1 ports
+[DEBUG]   sheep: 2 ports
+[DEBUG]   wheat: 1 ports
+[DEBUG]   wood: 1 ports
+
+[OK] SMALL board generated!
+  Row pattern:    [5, 6, 7, 6, 5]
+  Land hexes:      30
+  Water hexes:     22
+  Total hexes:     51
+  Generic 3:1:      5
+  Specific 2:1:     6
+  Plain water:     11
+
+--------------------------------------------------------------------------------
+Generating STANDARD board...
+--------------------------------------------------------------------------------
+[DEBUG] Generated 34 land coordinates
+[DEBUG] Land coord sample: [(-2,-2), (-1,-2), (0,-2), (1,-2), (2,-2)]
+[DEBUG] Created 34 land hexes
+[DEBUG] Available numbers (unshuffled): [2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 8, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 11, 11, 12]
+[DEBUG] Number counts BEFORE: [(2, 1), (3, 2), (4, 4), (5, 5), (6, 5), (8, 5), (9, 4), (10, 4), (11, 2), (12, 1)]
+[DEBUG] Shuffled numbers: [6, 9, 6, 5, 8, 10, 3, 2, 6, 4, 10, 5, 4, 9, 6, 8, 5, 8, 9, 3, 11, 8, 12, 11, 10, 4, 5, 10, 8, 6, 5, 9, 4]
+[DEBUG] Number counts AFTER assignment: [(2, 1), (3, 2), (4, 4), (5, 5), (6, 5), (8, 5), (9, 4), (10, 4), (11, 2), (12, 1)]
+[DEBUG] Total assigned: 33
+[DEBUG] Land hexes without desert: 33
+[DEBUG] Top row (r=-3): [(-2,-3), (-1,-3), (0,-3), (1,-3), (2,-3), (3,-3), (-3,-3)]
+[DEBUG] Row 0 (r=-2): left=(-3,-2), right=(4,-2)
+[DEBUG] Row 1 (r=-1): left=(-2,-1), right=(6,-1)
+[DEBUG] Row 2 (r=0): left=(-1,0), right=(8,0)
+[DEBUG] Row 3 (r=1): left=(-2,1), right=(6,1)
+[DEBUG] Row 4 (r=2): left=(-3,2), right=(4,2)
+[DEBUG] Bottom row (r=3): [(-3,3), (-2,3), (-1,3), (0,3), (1,3), (2,3), (3,3)]
+[DEBUG] Total water coords generated: 24
+[DEBUG] Generated 24 water coordinates
+[DEBUG] Water coord sample (first 6): [(-2,-3), (-1,-3), (0,-3), (1,-3), (2,-3), (3,-3)]
+[DEBUG] Water coord sample (last 6): [(-1,3), (0,3), (1,3), (2,3), (3,3), (0,0)]
+[DEBUG] DESERT placed at D1: (-1,0)
+[DEBUG] Created 24 water hexes
+
+[DEBUG] Hex label examples:
+[DEBUG] ROW A (r=-3, top water):
+[DEBUG]   A1: (-2,-3)
+[DEBUG]   A2: (-1,-3)
+[DEBUG]   A3: (0,-3)
+[DEBUG] ROW D (r=0, with desert at D1 and water at D2):
+[DEBUG]   D1: (-1,0) = desert
+[DEBUG]   D2: (0,0) = sheep
+[DEBUG]   D3: (0,0) = sheep
+[DEBUG]   D4: (1,0) = wood
+
+[DEBUG] Port distribution (water hexes with A-G/1-x labels):
+[DEBUG]   A2: generic
+[DEBUG]   A4: sheep
+[DEBUG]   A6: generic
+[DEBUG]   A0: brick
+[DEBUG]   B8: wheat
+[DEBUG]   C9: generic
+[DEBUG]   D10: wood
+[DEBUG]   E9: generic
+[DEBUG]   F8: sheep
+[DEBUG]   G1: generic
+[DEBUG]   G3: ore
+[DEBUG]   G5: generic
+
+[DEBUG] Port summary:
+[DEBUG]   brick: 1 ports
+[DEBUG]   generic: 6 ports
+[DEBUG]   ore: 1 ports
+[DEBUG]   sheep: 2 ports
+[DEBUG]   wheat: 1 ports
+[DEBUG]   wood: 1 ports
+
+[OK] STANDARD board generated!
+  Row pattern:    [6, 7, 8, 7, 6]
+  Land hexes:      35
+  Water hexes:     24
+  Total hexes:     58
+  Generic 3:1:      6
+  Specific 2:1:     6
+  Plain water:     12
+
+--------------------------------------------------------------------------------
+Generating LARGE board...
+--------------------------------------------------------------------------------
+[DEBUG] Generated 44 land coordinates
+[DEBUG] Land coord sample: [(-2,-2), (-1,-2), (0,-2), (1,-2), (2,-2)]
+[DEBUG] Created 44 land hexes
+[DEBUG] Available numbers (unshuffled): [2, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 10, 10, 10, 10, 11, 11, 12]
+[DEBUG] Number counts BEFORE: [(2, 1), (3, 2), (4, 6), (5, 7), (6, 7), (8, 5), (9, 5), (10, 4), (11, 2), (12, 1)]
+[DEBUG] Shuffled numbers: [3, 6, 6, 8, 2, 8, 10, 10, 11, 4, 8, 9, 10, 5, 5, 9, 4, 6, 4, 9, 11, 8, 5, 5, 10, 4, 5, 6, 9, 6, 9, 5, 4, 6, 8, 12, 3, 5, 4, 6]
+[DEBUG] Number counts AFTER assignment: [(2, 1), (3, 2), (4, 6), (5, 7), (6, 7), (8, 5), (9, 5), (10, 4), (11, 2), (12, 1)]
+[DEBUG] Total assigned: 40
+[DEBUG] Land hexes without desert: 43
+[DEBUG] Top row (r=-3): [(-2,-3), (-1,-3), (0,-3), (1,-3), (2,-3), (3,-3), (4,-3), (5,-3), (-3,-3)]
+[DEBUG] Row 0 (r=-2): left=(-3,-2), right=(6,-2)
+[DEBUG] Row 1 (r=-1): left=(-2,-1), right=(8,-1)
+[DEBUG] Row 2 (r=0): left=(-1,0), right=(10,0)
+[DEBUG] Row 3 (r=1): left=(-2,1), right=(8,1)
+[DEBUG] Row 4 (r=2): left=(-3,2), right=(6,2)
+[DEBUG] Bottom row (r=3): [(-3,3), (-2,3), (-1,3), (0,3), (1,3), (2,3), (3,3), (4,3), (5,3)]
+[DEBUG] Total water coords generated: 28
+[DEBUG] Generated 28 water coordinates
+[DEBUG] Water coord sample (first 6): [(-2,-3), (-1,-3), (0,-3), (1,-3), (2,-3), (3,-3)]
+[DEBUG] Water coord sample (last 6): [(1,3), (2,3), (3,3), (4,3), (5,3), (0,0)]
+[DEBUG] DESERT placed at D1: (-1,0)
+[DEBUG] Created 28 water hexes
+
+[DEBUG] Hex label examples:
+[DEBUG] ROW A (r=-3, top water):
+[DEBUG]   A1: (-2,-3)
+[DEBUG]   A2: (-1,-3)
+[DEBUG]   A3: (0,-3)
+[DEBUG] ROW D (r=0, with desert at D1 and water at D2):
+[DEBUG]   D1: (-1,0) = desert
+[DEBUG]   D2: (0,0) = sheep
+[DEBUG]   D3: (0,0) = sheep
+[DEBUG]   D4: (1,0) = wheat
+
+[DEBUG] Port distribution (water hexes with A-G/1-x labels):
+[DEBUG]   A2: generic
+[DEBUG]   A4: wheat
+[DEBUG]   A6: generic
+[DEBUG]   A8: wood
+[DEBUG]   A0: sheep
+[DEBUG]   B10: generic
+[DEBUG]   C11: brick
+[DEBUG]   D12: generic
+[DEBUG]   E11: ore
+[DEBUG]   F10: generic
+[DEBUG]   G1: sheep
+[DEBUG]   G3: generic
+[DEBUG]   G7: generic
+
+[DEBUG] Port summary:
+[DEBUG]   brick: 1 ports
+[DEBUG]   generic: 7 ports
+[DEBUG]   ore: 1 ports
+[DEBUG]   sheep: 2 ports
+[DEBUG]   wheat: 1 ports
+[DEBUG]   wood: 1 ports
+
+[OK] LARGE board generated!
+  Row pattern:    [8, 9, 10, 9, 8]
+  Land hexes:      45
+  Water hexes:     28
+  Total hexes:     72
+  Generic 3:1:      7
+  Specific 2:1:     6
+  Plain water:     15
+
+--------------------------------------------------------------------------------
+Generating XLARGE board...
+--------------------------------------------------------------------------------
+[DEBUG] Generated 49 land coordinates
+[DEBUG] Land coord sample: [(-2,-2), (-1,-2), (0,-2), (1,-2), (2,-2)]
+[DEBUG] Created 49 land hexes
+[DEBUG] Available numbers (unshuffled): [2, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 10, 10, 10, 11, 11, 12]
+[DEBUG] Number counts BEFORE: [(2, 1), (3, 2), (4, 7), (5, 8), (6, 8), (8, 5), (9, 6), (10, 3), (11, 2), (12, 1)]
+[DEBUG] Shuffled numbers: [10, 6, 8, 11, 6, 2, 5, 5, 9, 6, 5, 8, 4, 6, 9, 8, 4, 8, 4, 3, 3, 9, 10, 4, 4, 5, 5, 11, 10, 6, 6, 9, 5, 4, 5, 4, 8, 6, 9, 12, 6, 9, 5]
+[DEBUG] Number counts AFTER assignment: [(2, 1), (3, 2), (4, 7), (5, 8), (6, 8), (8, 5), (9, 6), (10, 3), (11, 2), (12, 1)]
+[DEBUG] Total assigned: 43
+[DEBUG] Land hexes without desert: 48
+[DEBUG] Top row (r=-3): [(-2,-3), (-1,-3), (0,-3), (1,-3), (2,-3), (3,-3), (4,-3), (5,-3), (6,-3), (-3,-3)]
+[DEBUG] Row 0 (r=-2): left=(-3,-2), right=(7,-2)
+[DEBUG] Row 1 (r=-1): left=(-2,-1), right=(9,-1)
+[DEBUG] Row 2 (r=0): left=(-1,0), right=(11,0)
+[DEBUG] Row 3 (r=1): left=(-2,1), right=(9,1)
+[DEBUG] Row 4 (r=2): left=(-3,2), right=(7,2)
+[DEBUG] Bottom row (r=3): [(-3,3), (-2,3), (-1,3), (0,3), (1,3), (2,3), (3,3), (4,3), (5,3), (6,3)]
+[DEBUG] Total water coords generated: 30
+[DEBUG] Generated 30 water coordinates
+[DEBUG] Water coord sample (first 6): [(-2,-3), (-1,-3), (0,-3), (1,-3), (2,-3), (3,-3)]
+[DEBUG] Water coord sample (last 6): [(2,3), (3,3), (4,3), (5,3), (6,3), (0,0)]
+[DEBUG] DESERT placed at D1: (-1,0)
+[DEBUG] Created 30 water hexes
+
+[DEBUG] Hex label examples:
+[DEBUG] ROW A (r=-3, top water):
+[DEBUG]   A1: (-2,-3)
+[DEBUG]   A2: (-1,-3)
+[DEBUG]   A3: (0,-3)
+[DEBUG] ROW D (r=0, with desert at D1 and water at D2):
+[DEBUG]   D1: (-1,0) = desert
+[DEBUG]   D2: (0,0) = wood
+[DEBUG]   D3: (0,0) = wood
+[DEBUG]   D4: (1,0) = sheep
+
+[DEBUG] Port distribution (water hexes with A-G/1-x labels):
+[DEBUG]   A2: generic
+[DEBUG]   A4: ore
+[DEBUG]   A6: generic
+[DEBUG]   A8: sheep
+[DEBUG]   A0: sheep
+[DEBUG]   B1: generic
+[DEBUG]   C1: brick
+[DEBUG]   E1: wood
+[DEBUG]   F1: generic
+[DEBUG]   G0: wheat
+[DEBUG]   G2: generic
+[DEBUG]   G6: generic
+[DEBUG]   D2: generic
+
+[DEBUG] Port summary:
+[DEBUG]   brick: 1 ports
+[DEBUG]   generic: 7 ports
+[DEBUG]   ore: 1 ports
+[DEBUG]   sheep: 2 ports
+[DEBUG]   wheat: 1 ports
+[DEBUG]   wood: 1 ports
+
+[OK] XLARGE board generated!
+  Row pattern:    [9, 10, 11, 10, 9]
+  Land hexes:      50
+  Water hexes:     30
+  Total hexes:     79
+  Generic 3:1:      7
+  Specific 2:1:     6
+  Plain water:     17
+
+--------------------------------------------------------------------------------
+Generating ULTRA_LARGE board...
+--------------------------------------------------------------------------------
+[DEBUG] Generated 54 land coordinates
+[DEBUG] Land coord sample: [(-2,-2), (-1,-2), (0,-2), (1,-2), (2,-2)]
+[DEBUG] Created 54 land hexes
+[DEBUG] Available numbers (unshuffled): [2, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 10, 10, 10, 10, 11, 11, 12]
+[DEBUG] Number counts BEFORE: [(2, 1), (3, 2), (4, 8), (5, 9), (6, 9), (8, 6), (9, 6), (10, 4), (11, 2), (12, 1)]
+[DEBUG] Shuffled numbers: [6, 5, 4, 5, 5, 5, 4, 8, 6, 2, 6, 6, 11, 9, 9, 8, 5, 10, 10, 4, 10, 6, 4, 3, 6, 3, 9, 8, 4, 4, 5, 9, 6, 9, 8, 5, 4, 5, 4, 8, 6, 8, 10, 12, 6, 11, 9, 5]
+[DEBUG] Number counts AFTER assignment: [(2, 1), (3, 2), (4, 8), (5, 9), (6, 9), (8, 6), (9, 6), (10, 4), (11, 2), (12, 1)]
+[DEBUG] Total assigned: 48
+[DEBUG] Land hexes without desert: 53
+[DEBUG] Top row (r=-3): [(-2,-3), (-1,-3), (0,-3), (1,-3), (2,-3), (3,-3), (4,-3), (5,-3), (6,-3), (7,-3), (-3,-3)]
+[DEBUG] Row 0 (r=-2): left=(-3,-2), right=(8,-2)
+[DEBUG] Row 1 (r=-1): left=(-2,-1), right=(10,-1)
+[DEBUG] Row 2 (r=0): left=(-1,0), right=(12,0)
+[DEBUG] Row 3 (r=1): left=(-2,1), right=(10,1)
+[DEBUG] Row 4 (r=2): left=(-3,2), right=(8,2)
+[DEBUG] Bottom row (r=3): [(-3,3), (-2,3), (-1,3), (0,3), (1,3), (2,3), (3,3), (4,3), (5,3), (6,3), (7,3)]
+[DEBUG] Total water coords generated: 32
+[DEBUG] Generated 32 water coordinates
+[DEBUG] Water coord sample (first 6): [(-2,-3), (-1,-3), (0,-3), (1,-3), (2,-3), (3,-3)]
+[DEBUG] Water coord sample (last 6): [(3,3), (4,3), (5,3), (6,3), (7,3), (0,0)]
+[DEBUG] DESERT placed at D1: (-1,0)
+[DEBUG] Created 32 water hexes
+
+[DEBUG] Hex label examples:
+[DEBUG] ROW A (r=-3, top water):
+[DEBUG]   A1: (-2,-3)
+[DEBUG]   A2: (-1,-3)
+[DEBUG]   A3: (0,-3)
+[DEBUG] ROW D (r=0, with desert at D1 and water at D2):
+[DEBUG]   D1: (-1,0) = desert
+[DEBUG]   D2: (0,0) = wheat
+[DEBUG]   D3: (0,0) = wheat
+[DEBUG]   D4: (1,0) = sheep
+
+[DEBUG] Port distribution (water hexes with A-G/1-x labels):
+[DEBUG]   A2: generic
+[DEBUG]   A4: sheep
+[DEBUG]   A6: generic
+[DEBUG]   A8: wood
+[DEBUG]   A10: generic
+[DEBUG]   A0: sheep
+[DEBUG]   B12: wheat
+[DEBUG]   C13: generic
+[DEBUG]   D14: brick
+[DEBUG]   E13: generic
+[DEBUG]   F12: ore
+[DEBUG]   G1: generic
+[DEBUG]   G5: generic
+[DEBUG]   G9: generic
+
+[DEBUG] Port summary:
+[DEBUG]   brick: 1 ports
+[DEBUG]   generic: 8 ports
+[DEBUG]   ore: 1 ports
+[DEBUG]   sheep: 2 ports
+[DEBUG]   wheat: 1 ports
+[DEBUG]   wood: 1 ports
+
+[OK] ULTRA_LARGE board generated!
+  Row pattern:    [10, 11, 12, 11, 10]
+  Land hexes:      55
+  Water hexes:     32
+  Total hexes:     86
+  Generic 3:1:      8
+  Specific 2:1:     6
+  Plain water:     18
+
+
+================================================================================
+SUMMARY TABLE - All 7 Board Sizes
+================================================================================
+
+Size            Rows                 Land     Water    Total   
+--------------------------------------------------------------------------------
+ultra_small     [2, 3, 4, 3, 2]      15       16       30      
+micro           [3, 4, 5, 4, 3]      20       18       37      
+small           [5, 6, 7, 6, 5]      30       22       51      
+standard        [6, 7, 8, 7, 6]      35       24       58      
+large           [8, 9, 10, 9, 8]     45       28       72      
+xlarge          [9, 10, 11, 10, 9]   50       30       79      
+ultra_large     [10, 11, 12, 11, 10] 55       32       86      
+
+================================================================================
+

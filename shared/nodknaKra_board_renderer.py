@@ -1,277 +1,185 @@
 """
-Project: NodKnaKra Settlers of Catan
-File: nodknaKra_board_renderer.py
-Created: 2026-07-08
-
-EDIT HISTORY (most recent first):
-2026-07-10 - Gordon - Final complete renderer with pointy-top hexagons, water hexes, and proper port distribution
-2026-07-09 - Gordon - Added water hexes and port indicators to renderer
-2026-07-09 - Gordon - Fixed coordinate calculation to match board generator's q range
-2026-07-08 - Gordon - Changed to pointy-top hexagon orientation with proper interlocking spacing
+NodKnaKra Renderer - Pygame-based visual board renderer for OOP game
 """
 
 import pygame
-import math
-from typing import Dict, Tuple, Optional, List
+import sys
+from typing import Dict, Tuple
+from nodknaKra_game import Game, GameHex
+from nodknaKra_maps_oop import HexType
 
 
-class BoardRenderer:
-    """Renders the complete NodKnaKra board using Pygame"""
+class HexRenderer:
+    """Renders hexagons and game state with Pygame"""
     
-    # Terrain colors
-    TERRAIN_COLORS = {
-        'wood': (34, 139, 34),
-        'brick': (178, 100, 60),
-        'sheep': (220, 220, 180),
-        'wheat': (255, 223, 100),
-        'ore': (140, 140, 140),
-        'desert': (210, 180, 140),
-        'water': (100, 149, 237)  # Cornflower blue
+    # Colors
+    COLORS = {
+        HexType.WATER: (100, 150, 200),      # Light blue
+        HexType.WOOD: (34, 139, 34),         # Forest green
+        HexType.BRICK: (205, 92, 92),        # Brick red
+        HexType.SHEEP: (240, 230, 200),      # Wheat/beige
+        HexType.WHEAT: (255, 215, 0),        # Gold
+        HexType.ORE: (128, 128, 128),        # Gray
+        HexType.DESERT: (255, 222, 89),      # Sandy yellow
     }
     
-    # Port colors
-    PORT_COLORS = {
-        'generic': (255, 165, 0),    # Orange
-        'wood': (34, 139, 34),       # Green
-        'brick': (178, 100, 60),     # Brown
-        'sheep': (220, 220, 180),    # Cream
-        'wheat': (255, 223, 100),    # Gold
-        'ore': (140, 140, 140)       # Gray
-    }
+    BORDER_COLOR = (0, 0, 0)
+    TEXT_COLOR = (0, 0, 0)
+    BACKGROUND_COLOR = (200, 200, 200)
     
-    COLOR_BORDER = (0, 0, 0)
-    COLOR_NUMBER = (0, 0, 0)
-    COLOR_BACKGROUND = (240, 248, 255)
-    
-    def __init__(self, row_pattern: List[int] = None, width: int = 1000, height: int = 800, hex_size: int = 45):
-        """Initialize renderer"""
+    def __init__(self, width: int = 1400, height: int = 900, hex_size: int = 40):
         pygame.init()
-        
-        self.row_pattern = row_pattern or [6, 7, 8, 7, 6]
         self.width = width
         self.height = height
         self.hex_size = hex_size
-        
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption("NodKnaKra Settlers of Catan")
-        
-        self.font_large = pygame.font.Font(None, 32)
-        self.font_small = pygame.font.Font(None, 24)
-        self.font_tiny = pygame.font.Font(None, 20)  # Increased from 16 for port labels
-        
         self.clock = pygame.time.Clock()
-        self.running = True
+        self.font = pygame.font.Font(None, 24)
+        self.title_font = pygame.font.Font(None, 36)
     
-    def hex_to_pixel(self, hex_coord) -> Tuple[int, int]:
-        """Convert hex coordinates to pixel coordinates (pointy-top hexagons)"""
-        q = hex_coord.q
-        r = hex_coord.r
+    def hex_to_pixel(self, position: str, offset_x: int = 0, offset_y: int = 0) -> Tuple[int, int]:
+        """Convert hex position (A1, B5, etc.) to pixel coordinates"""
+        row_letter = position[0]
+        col_num = int(position[1:])
         
-        hex_width = self.hex_size * math.sqrt(3)
-        row_height = self.hex_size * 2
+        # Row letter to row index (A=0, B=1, ... G=6)
+        row_idx = ord(row_letter) - ord('A')
         
+        # Hexagon layout: pointy-top, horizontal spacing
+        hex_width = self.hex_size * 2
+        hex_height = self.hex_size * 1.732  # sqrt(3)
+        
+        # Center of screen
         center_x = self.width // 2
         center_y = self.height // 2
         
-        # Get row info
-        middle_row = len(self.row_pattern) // 2
-        row_idx = r + middle_row
+        # Vertical offset (each row down)
+        y = center_y + (row_idx - 3) * hex_height * 0.75
         
-        # Calculate vertical position
-        y = center_y + (r * row_height * 0.75)
+        # Horizontal offset (depends on row)
+        # Rows stagger: A=6, B=7, C=8, D=9 (widest), E=8, F=7, G=6
+        row_widths = [6, 7, 8, 9, 8, 7, 6]  # Width of each row
+        row_start_offset = (9 - row_widths[row_idx]) // 2
+        x = center_x + (col_num - row_start_offset - row_widths[row_idx] / 2) * hex_width / 2
         
-        # Handle special water rows (outside row_pattern)
-        if r == -middle_row - 1:
-            # Top water row (r=-3 for standard board)
-            # 7 hexes: q from -3 to 3
-            center_q = 0.0
-        elif r == middle_row + 1:
-            # Bottom water row (r=3 for standard board)
-            # 7 hexes: q from -3 to 3 (mirrors top row)
-            center_q = 0.0
-        elif 0 <= row_idx < len(self.row_pattern):
-            # Normal land or middle water rows
-            row_width = self.row_pattern[row_idx]
-            offset = abs(middle_row - row_idx)
-            
-            min_q = -offset
-            max_q = row_width - offset - 1
-            center_q = (min_q + max_q) / 2.0
-        else:
-            # Fallback
-            center_q = 0.0
-        
-        # Calculate horizontal position
-        row_center = center_x - center_q * hex_width
-        x = row_center + q * hex_width
-        
-        return (int(x), int(y))
+        return int(x + offset_x), int(y + offset_y)
     
-    def draw_hexagon(self, center: Tuple[int, int], terrain_color: Tuple[int, int, int], border_width: int = 2):
-        """Draw pointy-top hexagon"""
+    def draw_hexagon(self, center: Tuple[int, int], color: Tuple[int, int, int], filled: bool = True):
+        """Draw a regular hexagon"""
+        import math
         points = []
         for i in range(6):
-            angle = math.pi / 2 + math.pi / 3 * i  # Start at 90° for pointy-top
+            angle = math.radians(i * 60)
             x = center[0] + self.hex_size * math.cos(angle)
             y = center[1] + self.hex_size * math.sin(angle)
             points.append((x, y))
         
-        pygame.draw.polygon(self.screen, terrain_color, points)
-        pygame.draw.polygon(self.screen, self.COLOR_BORDER, points, border_width)
+        if filled:
+            pygame.draw.polygon(self.screen, color, points)
+        pygame.draw.polygon(self.screen, self.BORDER_COLOR, points, 2)
     
-    def draw_number_token(self, center: Tuple[int, int], number: int):
-        """Draw number token"""
-        if number == 0:
-            return
+    def draw_hex(self, hex_obj: GameHex, position: Tuple[int, int]):
+        """Draw a single game hex"""
+        # Draw hexagon background
+        color = self.COLORS.get(hex_obj.hex_type, (200, 200, 200))
+        self.draw_hexagon(position, color)
         
-        if number in [6, 8]:
-            token_color = (220, 80, 80)
-        else:
-            token_color = (200, 200, 200)
+        # Draw hex label
+        label_text = self.font.render(hex_obj.position, True, self.TEXT_COLOR)
+        label_rect = label_text.get_rect(center=position)
+        self.screen.blit(label_text, label_rect)
         
-        token_radius = self.hex_size // 3
-        pygame.draw.circle(self.screen, token_color, center, token_radius)
-        pygame.draw.circle(self.screen, self.COLOR_BORDER, center, token_radius, 2)
-        
-        text = self.font_small.render(str(number), True, self.COLOR_NUMBER)
-        text_rect = text.get_rect(center=center)
-        self.screen.blit(text, text_rect)
+        # Draw number token if present
+        if hex_obj.number_token is not None:
+            token_text = self.font.render(str(hex_obj.number_token), True, self.TEXT_COLOR)
+            token_x = position[0]
+            token_y = position[1] + 15
+            token_rect = token_text.get_rect(center=(token_x, token_y))
+            self.screen.blit(token_text, token_rect)
     
-    def draw_port_indicator(self, center: Tuple[int, int], port_type: str):
-        """Draw port indicator centered on water hex"""
-        # Draw large circle centered on hex
-        indicator_radius = 20
+    def render_board(self, game: Game):
+        """Render the complete board"""
+        running = True
         
-        port_color = self.PORT_COLORS.get(port_type, (255, 255, 255))
-        pygame.draw.circle(self.screen, port_color, (int(center[0]), int(center[1])), indicator_radius)
-        pygame.draw.circle(self.screen, self.COLOR_BORDER, (int(center[0]), int(center[1])), indicator_radius, 2)
-        
-        # Draw ratio text centered
-        if port_type == 'generic':
-            ratio_text = "3:1"
-        else:
-            ratio_text = "2:1"
-        
-        text = self.font_small.render(ratio_text, True, (0, 0, 0))
-        text_rect = text.get_rect(center=center)
-        self.screen.blit(text, text_rect)
-    
-    def draw_board(self, all_hexes: Dict):
-        """Draw the entire board"""
-        self.screen.fill(self.COLOR_BACKGROUND)
-        
-        # Separate land and water
-        land_hexes = {}
-        water_hexes = {}
-        
-        for coord, hex_obj in all_hexes.items():
-            if hex_obj.terrain.value == 'water':
-                water_hexes[coord] = hex_obj
-            else:
-                land_hexes[coord] = hex_obj
-        
-        # Draw water hexes first (background)
-        for coord, hex_obj in water_hexes.items():
-            pixel_pos = self.hex_to_pixel(coord)
-            terrain_color = self.TERRAIN_COLORS.get('water', (100, 149, 237))
-            self.draw_hexagon(pixel_pos, terrain_color)
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        running = False
             
-            # Draw port indicator if hex has a port
-            if hex_obj.port:
-                self.draw_port_indicator(pixel_pos, hex_obj.port.value)
-        
-        # Draw land hexes on top
-        for coord, hex_obj in land_hexes.items():
-            pixel_pos = self.hex_to_pixel(coord)
-            terrain_color = self.TERRAIN_COLORS.get(hex_obj.terrain.value, (200, 200, 200))
-            self.draw_hexagon(pixel_pos, terrain_color)
+            # Clear screen
+            self.screen.fill(self.BACKGROUND_COLOR)
             
-            if hex_obj.number_token > 0:
-                self.draw_number_token(pixel_pos, hex_obj.number_token)
-        
-        # Draw title
-        title = self.font_large.render("NodKnaKra Settlers of Catan - Complete Board", True, (0, 0, 0))
-        title_rect = title.get_rect(topleft=(20, 20))
-        self.screen.blit(title, title_rect)
-        
-        self.draw_legend()
-        pygame.display.flip()
-    
-    def draw_legend(self):
-        """Draw terrain and port legend on the LEFT side"""
-        legend_x = 20  # Left side instead of right
-        legend_y = 20
-        box_size = 15
-        spacing = 22
-        
-        # Terrain legend
-        terrain_label = self.font_small.render("Terrain:", True, (0, 0, 0))
-        self.screen.blit(terrain_label, (legend_x, legend_y))
-        
-        terrain_start_y = legend_y + 25
-        terrain_items = ['wood', 'brick', 'sheep', 'wheat', 'ore', 'desert', 'water']
-        
-        for i, terrain_name in enumerate(terrain_items):
-            y = terrain_start_y + (i * spacing)
-            color = self.TERRAIN_COLORS.get(terrain_name, (200, 200, 200))
-            pygame.draw.rect(self.screen, color, (legend_x, y, box_size, box_size))
-            pygame.draw.rect(self.screen, self.COLOR_BORDER, (legend_x, y, box_size, box_size), 1)
-            label = self.font_tiny.render(terrain_name.capitalize(), True, (0, 0, 0))
-            self.screen.blit(label, (legend_x + box_size + 10, y + 1))
-        
-        # Port legend
-        port_start_y = terrain_start_y + (len(terrain_items) * spacing) + 20
-        port_label = self.font_small.render("Ports:", True, (0, 0, 0))
-        self.screen.blit(port_label, (legend_x, port_start_y))
-        
-        port_items = [('generic', '3:1'), ('wood', '2:1'), ('brick', '2:1'), 
-                      ('sheep', '2:1'), ('wheat', '2:1'), ('ore', '2:1')]
-        
-        for i, (port_name, ratio) in enumerate(port_items):
-            y = port_start_y + 25 + (i * spacing)
-            color = self.PORT_COLORS.get(port_name, (255, 255, 255))
-            pygame.draw.circle(self.screen, color, (legend_x + 8, y + 8), 6)
-            pygame.draw.circle(self.screen, self.COLOR_BORDER, (legend_x + 8, y + 8), 6, 1)
-            label = self.font_tiny.render(f"{port_name.capitalize()} {ratio}", True, (0, 0, 0))
-            self.screen.blit(label, (legend_x + box_size + 10, y))
-    
-    def handle_events(self):
-        """Handle pygame events"""
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    self.running = False
-    
-    def run(self, all_hexes: Dict):
-        """Run the renderer loop"""
-        while self.running:
-            self.handle_events()
-            self.draw_board(all_hexes)
+            # Draw title
+            title = self.title_font.render(f"{game.map_name.upper()} Map", True, self.TEXT_COLOR)
+            title_rect = title.get_rect(center=(self.width // 2, 20))
+            self.screen.blit(title, title_rect)
+            
+            # Draw all hexes
+            board_data = game.get_board_data()
+            for position, hex_obj in board_data['hexes'].items():
+                pixel_pos = self.hex_to_pixel(position)
+                self.draw_hex(hex_obj, pixel_pos)
+            
+            # Draw legend
+            legend_x = 20
+            legend_y = 60
+            legend_items = [
+                ("W", HexType.WOOD, "Wood"),
+                ("B", HexType.BRICK, "Brick"),
+                ("S", HexType.SHEEP, "Sheep"),
+                ("T", HexType.WHEAT, "Wheat"),
+                ("O", HexType.ORE, "Ore"),
+                ("D", HexType.DESERT, "Desert"),
+                ("~", HexType.WATER, "Water"),
+            ]
+            
+            for i, (abbr, hex_type, name) in enumerate(legend_items):
+                color = self.COLORS[hex_type]
+                y = legend_y + i * 30
+                
+                # Draw small hex
+                pygame.draw.circle(self.screen, color, (legend_x + 10, y), 8)
+                pygame.draw.circle(self.screen, self.BORDER_COLOR, (legend_x + 10, y), 8, 2)
+                
+                # Draw label
+                label = self.font.render(f"  {name}", True, self.TEXT_COLOR)
+                self.screen.blit(label, (legend_x + 25, y - 12))
+            
+            # Draw instructions
+            instructions = self.font.render("Press ESC to exit", True, self.TEXT_COLOR)
+            self.screen.blit(instructions, (20, self.height - 30))
+            
+            pygame.display.flip()
             self.clock.tick(60)
         
         pygame.quit()
 
 
-if __name__ == "__main__":
-    print("\nTesting NodKnaKra Complete Board Renderer...\n")
-    
+def main():
+    """Main entry point"""
     import sys
-    sys.path.insert(0, '.')
-    from nodknaKra_board import NodKnaKraBoard
     
-    board = NodKnaKraBoard(seed=42)
-    hexes_dict = board.generate()
-    all_hexes = board.get_all_hexes()
+    # Allow map selection from command line
+    map_name = sys.argv[1] if len(sys.argv) > 1 else 'standard'
+    seed = int(sys.argv[2]) if len(sys.argv) > 2 else 42
     
-    print(f"✓ Generated complete board with {len(all_hexes)} total hexes")
-    board.print_stats()
+    print(f"\nLoading {map_name.upper()} map (seed={seed})...")
+    game = Game(map_name=map_name, seed=seed)
     
-    print("✓ Starting Pygame renderer...")
-    print("(Close window or press ESC to exit)\n")
+    # Show ASCII representation
+    game.render_ascii()
     
-    renderer = BoardRenderer(row_pattern=[6, 7, 8, 7, 6])
-    renderer.run(all_hexes)
+    # Show visual representation
+    print(f"Rendering {map_name} map with Pygame...")
+    print("(Press ESC to exit)\n")
     
-    print("✓ Renderer closed!")
+    renderer = HexRenderer()
+    renderer.render_board(game)
+
+
+if __name__ == "__main__":
+    main()

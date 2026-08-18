@@ -1,0 +1,92 @@
+<div style="padding: 1rem 0;">
+  <style>
+    .card-container { display: flex; gap: 12px; margin-bottom: 1.5rem; align-items: center; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; }
+    .card { width: 50px; height: 70px; border: 1px solid #999; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 16px; cursor: grab; flex-shrink: 0; }
+    .card-wood { background: #c8e6c9; color: #2d5016; }
+    .card-brick { background: #ffccbc; color: #6d3c1b; }
+    .card-sheep { background: #fff9c4; color: #6d6b1d; }
+    .card-ore { background: #cfd8dc; color: #263238; }
+    .card-wheat { background: #ffe0b2; color: #6d4c1d; }
+    .card-letter { position: absolute; top: 4px; left: 4px; font-size: 11px; font-weight: 700; opacity: 0.8; }
+    .card { position: relative; }
+    .button { padding: 8px 16px; background: #378add; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; }
+    .button:hover { background: #2370c7; }
+    .stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 1.5rem; padding: 1rem; background: #f5f5f5; border-radius: 6px; }
+    .stat-box { text-align: center; }
+    .stat-label { font-size: 12px; color: #666; margin-bottom: 4px; }
+    .stat-count { font-size: 20px; font-weight: 600; color: #333; }
+    .header { font-size: 14px; color: #666; margin-bottom: 1rem; }
+  </style>
+
+  <div style="margin-bottom: 1rem;">
+    <button class="button" onclick="dealCards()">Deal 10 Cards</button>
+  </div>
+
+  <div class="header">Your hand (scroll to see more):</div>
+  
+  <div id="cardDisplay" class="card-container"></div>
+
+  <div class="stats">
+    <div class="stat-box">
+      <div class="stat-label">Wood</div>
+      <div class="stat-count" id="count-wood">0</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Brick</div>
+      <div class="stat-count" id="count-brick">0</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Sheep</div>
+      <div class="stat-count" id="count-sheep">0</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Ore</div>
+      <div class="stat-count" id="count-ore">0</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Wheat</div>
+      <div class="stat-count" id="count-wheat">0</div>
+    </div>
+  </div>
+
+  <script>
+    const resources = [
+      { name: 'wood', label: 'W', class: 'card-wood' },
+      { name: 'brick', label: 'B', class: 'card-brick' },
+      { name: 'sheep', label: 'S', class: 'card-sheep' },
+      { name: 'ore', label: 'R', class: 'card-ore' },
+      { name: 'wheat', label: 'WH', class: 'card-wheat' }
+    ];
+
+    let hand = [];
+
+    function dealCards() {
+      hand = [];
+      for (let i = 0; i < 10; i++) {
+        const resource = resources[Math.floor(Math.random() * resources.length)];
+        hand.push(resource);
+      }
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      const display = document.getElementById('cardDisplay');
+      display.innerHTML = hand.map(card => 
+        `<div class="card ${card.class}">
+          <div class="card-letter">${card.label}</div>
+         </div>`
+      ).join('');
+
+      const counts = { wood: 0, brick: 0, sheep: 0, ore: 0, wheat: 0 };
+      hand.forEach(card => counts[card.name]++);
+
+      document.getElementById('count-wood').textContent = counts.wood;
+      document.getElementById('count-brick').textContent = counts.brick;
+      document.getElementById('count-sheep').textContent = counts.sheep;
+      document.getElementById('count-ore').textContent = counts.ore;
+      document.getElementById('count-wheat').textContent = counts.wheat;
+    }
+
+    dealCards();
+  </script>
+</div>

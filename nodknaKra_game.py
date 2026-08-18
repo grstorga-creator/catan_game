@@ -60,6 +60,7 @@ class GameHex:
         self.hex_type = hex_type
         self.number_token = None
         self.harbor = None
+        self.port_vertices = None  # 2 vertices that form the port (if this is a harbor hex)
         self.adjacent_terrain_positions = []
         
         # Vertex references (6 per hex, shared with neighbors)
@@ -123,7 +124,7 @@ class Board:
         self._load_map()
         self._randomize_terrain()
         self._distribute_tokens()
-        self._assign_harbors()
+        self._assign_harbors()  # Assign harbors (port vertices assigned later after hex-graph)
         # Hex-graph building deferred until renderer provides hex_to_pixel
     
     def finalize_hex_graph(self, hex_to_pixel_func):
@@ -136,6 +137,9 @@ class Board:
         
         # Now build the vertex/edge graph
         self._build_hex_graph()
+        
+        # Assign port vertices to harbor hexes (now that hex-graph exists)
+        self._assign_port_vertices_to_harbors()
     
     def _load_map(self):
         """Load hexes from map configuration"""
@@ -298,6 +302,65 @@ class Board:
         
         print(f"[DEBUG] Distributed {len(tokens)} tokens to {len(terrain_positions)} terrain hexes")
         print(f"[DEBUG] Token distribution: {dict(zip(token_values, token_counts))}")
+    
+    def _assign_port_vertices_to_harbors(self):
+        """Assign port vertices to all harbor hexes"""
+        for water_hex in self.get_water_hexes():
+            if water_hex.harbor:
+                self._assign_port_vertices(water_hex)
+                print(f"[DEBUG PORT] Harbor hex {water_hex.position} ({water_hex.harbor.value}): vertices {water_hex.port_vertices}")
+    
+    def _assign_port_vertices(self, water_hex: GameHex):
+        """
+        Assign 2 port vertices to a harbor hex.
+        Port vertices are the endpoints of an edge that borders both the water hex and a land hex.
+        """
+        hex_edges = water_hex.get_edges()
+        hex_edges = [e for e in hex_edges if e is not None]
+        
+        if not hex_edges:
+            print(f"[WARNING] Harbor hex {water_hex.position} has no edges")
+            return
+        
+        # Find edges that touch at least one land hex
+        coastal_edges = []
+        for edge in hex_edges:
+            if self._edge_touches_land(edge.edge_id):
+                coastal_edges.append(edge)
+        
+        if not coastal_edges:
+            print(f"[WARNING] Harbor hex {water_hex.position} has no coastal edges")
+            return
+        
+        # Randomly pick one coastal edge for the port
+        port_edge = random.choice(coastal_edges)
+        
+        # The port vertices are the two endpoints of this edge
+        # Extract from edge_id (format: "x1,y1-x2,y2")
+        try:
+            vertices_str = port_edge.edge_id.split('-')
+            vertex_1_id = vertices_str[0]
+            vertex_2_id = vertices_str[1]
+            water_hex.port_vertices = (vertex_1_id, vertex_2_id)
+            print(f"[DEBUG PORT] Harbor hex {water_hex.position} assigned port edge {port_edge.edge_id} with vertices {vertex_1_id}, {vertex_2_id}")
+        except Exception as e:
+            print(f"[WARNING] Error parsing port edge {port_edge.edge_id}: {e}")
+    
+    def _edge_touches_land(self, edge_id: str) -> bool:
+        """Check if an edge touches at least one land hex"""
+        if edge_id not in self.edges:
+            return False
+        
+        # Find all hexes that contain this edge
+        for hex_obj in self.hexes.values():
+            hex_edges = hex_obj.get_edges()
+            for hex_edge in hex_edges:
+                if hex_edge and hex_edge.edge_id == edge_id:
+                    # Found a hex that contains this edge
+                    if hex_obj.hex_type not in [HexType.WATER, HexType.DESERT]:
+                        return True  # Found at least one land hex
+        
+        return False  # Only water/desert hexes
     
     def _assign_harbors(self):
         """Assign harbors to water hexes in alternating pattern"""

@@ -91,29 +91,39 @@ class NodKnaKraBoard:
         
         self.hexes: Dict[HexCoord, Hex] = {}
         self.water_hexes: Dict[HexCoord, Hex] = {}
+        self.hex_labels: Dict[HexCoord, str] = {}  # Cache of coordinate -> label
     
     def get_hex_label(self, coord) -> str:
-        """Convert hex coordinate (q,r) to A-G row, 1-x column label"""
+        """Get label for hex coordinate from cache"""
+        return self.hex_labels.get(coord, "?")
+    
+    def _build_hex_labels(self):
+        """Build all hex labels after board is generated"""
+        self.hex_labels = {}
         middle_row = self.num_rows // 2
         
-        # Row labels A-G based on r coordinate
-        row_letter = chr(ord('A') + (coord.r + middle_row + 1))
-        
-        # Column: count from left within this row
-        if coord.r == -middle_row - 1:
-            # Top water row
-            col_num = coord.q + middle_row + 1
-        elif coord.r == middle_row + 1:
-            # Bottom water row
-            col_num = coord.q + middle_row + 1
-        else:
-            # Middle rows
-            row_idx = coord.r + middle_row
-            row_width = self.row_pattern[row_idx]
-            offset = abs(middle_row - row_idx)
-            col_num = coord.q + offset + 2
-        
-        return f"{row_letter}{col_num}"
+        # Process each row
+        for r in range(-middle_row - 1, middle_row + 2):
+            # Get all hexes in this row
+            row_coords = []
+            
+            # Add land hexes
+            for coord in self.hexes.keys():
+                if coord.r == r:
+                    row_coords.append(coord)
+            
+            # Add water hexes
+            for coord in self.water_hexes.keys():
+                if coord.r == r:
+                    row_coords.append(coord)
+            
+            # Sort by q (left to right)
+            row_coords.sort(key=lambda c: c.q)
+            
+            # Assign labels
+            row_letter = chr(ord('A') + (r + middle_row))
+            for col_idx, coord in enumerate(row_coords, 1):
+                self.hex_labels[coord] = f"{row_letter}{col_idx}"
     
     def _calculate_token_distribution(self) -> List[int]:
         """
@@ -170,9 +180,9 @@ class NodKnaKraBoard:
         return tokens
     
     def _calculate_terrain_distribution(self) -> Dict[Terrain, int]:
-        hexes_without_desert = self.total_hexes - 1
-        hexes_per_resource = hexes_without_desert // 5
-        remainder = hexes_without_desert % 5
+        """Calculate terrain distribution for ALL hexes (including where desert will go)"""
+        hexes_per_resource = self.total_hexes // 5
+        remainder = self.total_hexes % 5
         
         distribution = {
             Terrain.WOOD: hexes_per_resource,
@@ -180,7 +190,6 @@ class NodKnaKraBoard:
             Terrain.SHEEP: hexes_per_resource,
             Terrain.WHEAT: hexes_per_resource,
             Terrain.ORE: hexes_per_resource,
-            Terrain.DESERT: 1
         }
         
         resources = [Terrain.WOOD, Terrain.BRICK, Terrain.SHEEP, Terrain.WHEAT, Terrain.ORE]
@@ -200,6 +209,8 @@ class NodKnaKraBoard:
         terrains = self._create_terrain_distribution()
         random.shuffle(land_coords)
         
+        print(f"[DEBUG] land_coords count BEFORE terrain assignment: {len(land_coords)}")
+        
         # SPECIAL: Place desert at D1 (first land hex in row D, the center row)
         # Row D is r=0, first land hex is at q=-1
         desert_coord = HexCoord(-1, 0)
@@ -213,7 +224,8 @@ class NodKnaKraBoard:
             else:
                 self.hexes[coord] = Hex(coord, terrain)
         
-        print(f"[DEBUG] Created {len(self.hexes)} land hexes")
+        print(f"[DEBUG] Created {len(self.hexes)} land hexes AFTER terrain assignment")
+        print(f"[DEBUG] board.hexes coordinates: {sorted([str(c) for c in self.hexes.keys()])}")
         
         # Distribute number tokens
         self._distribute_number_tokens()
@@ -260,6 +272,9 @@ class NodKnaKraBoard:
         
         # Place ports
         self._place_ports()
+        
+        # Build hex labels cache
+        self._build_hex_labels()
         
         return self.hexes
     

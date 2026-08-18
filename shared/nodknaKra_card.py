@@ -1,6 +1,11 @@
 """
-NodKnaKra Development Cards System
-Handles all 74 custom development cards with cancellation mechanics.
+Project: NodKnaKra Settlers of Catan
+File: nodknaKra_card.py
+Created: 2026-07-07
+
+EDIT HISTORY (most recent first):
+2026-07-08 - Gordon - Added file header with edit history tracking
+2026-07-07 - Gordon - Created Card and CardDeck classes with 74-card deck loading from JSON
 """
 
 import json
@@ -35,8 +40,8 @@ class Card:
     card_type: CardType
     description: str
     victory_points: int
-    can_cancel: List[str]  # Card IDs this can cancel
-    keep_card: bool  # True if card stays after play
+    can_cancel: List[str]
+    keep_card: bool
     playable_after_reveal: bool
     counts_toward_largest_army: bool = False
     affects_all_players: bool = False
@@ -80,13 +85,12 @@ class CardDeck:
     
     def __init__(self, config_path: Optional[str] = None):
         """Initialize the card deck from JSON config"""
-        self.cards: Dict[str, Card] = {}  # card_id -> Card
-        self.deck_pile: List[Card] = []   # Draw pile
-        self.discard_pile: List[Card] = [] # Discard pile
-        self.card_counts: Dict[str, int] = {}  # Track count of each card type
+        self.cards: Dict[str, Card] = {}
+        self.deck_pile: List[Card] = []
+        self.discard_pile: List[Card] = []
+        self.card_counts: Dict[str, int] = {}
         
         if config_path is None:
-            # Try to find config in standard location
             config_path = os.path.join(
                 os.path.dirname(__file__),
                 '..',
@@ -103,7 +107,6 @@ class CardDeck:
                 config = json.load(f)
             
             for card_data in config['cards']:
-                # Create Card object from JSON data
                 card = Card(
                     id=card_data['id'],
                     name=card_data['name'],
@@ -122,7 +125,6 @@ class CardDeck:
                 
                 self.cards[card.id] = card
                 
-                # Add to deck pile (count times)
                 count = card_data.get('count', 1)
                 self.card_counts[card.id] = count
                 for _ in range(count):
@@ -142,13 +144,12 @@ class CardDeck:
     def draw(self) -> Optional[Card]:
         """Draw a card from the deck"""
         if not self.deck_pile:
-            # Reshuffle discard pile if deck is empty
             if self.discard_pile:
                 self.deck_pile = self.discard_pile.copy()
                 self.discard_pile = []
                 self.shuffle()
             else:
-                return None  # No cards available
+                return None
         
         return self.deck_pile.pop(0)
     
@@ -198,7 +199,6 @@ class CardDeck:
         print(f"Total cards in deck: {len(self.deck_pile)}")
         print(f"Cards in discard: {len(self.discard_pile)}\n")
         
-        # Group by type
         by_type = {}
         for card in self.cards.values():
             card_type = card.card_type.value
@@ -218,18 +218,13 @@ class CardDeck:
         print("="*60 + "\n")
 
 
-# Test/Demo functionality
 if __name__ == "__main__":
     print("\nTesting NodKnaKra Card System...\n")
     
     try:
-        # Create deck
         deck = CardDeck()
-        
-        # Print summary
         deck.print_summary()
         
-        # Test drawing
         print("Drawing 5 cards:")
         for i in range(5):
             card = deck.draw()
@@ -239,7 +234,6 @@ if __name__ == "__main__":
         print(f"\nDeck size: {deck.deck_size()}")
         print(f"Cards left to draw: {deck.total_cards()}\n")
         
-        # Test card lookup
         print("Soldier cards available:")
         soldiers = deck.get_soldier_cards()
         for soldier in soldiers:

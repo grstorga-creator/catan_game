@@ -1,10 +1,14 @@
 """
-NodKnaKra Chips System
-Players earn chips when dice don't match their hex numbers.
-Chips can be converted to resources 1:1 with visible victory points.
+Project: NodKnaKra Settlers of Catan
+File: chips_system.py
+Created: 2026-07-08
+
+EDIT HISTORY (most recent first):
+2026-07-08 - Gordon - Added file header with edit history tracking
+2026-07-08 - Gordon - Created ChipsSystem class with earn, convert, trade mechanics
 """
 
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional
 
 
 class ChipsSystem:
@@ -14,9 +18,9 @@ class ChipsSystem:
         """Initialize chips for all players"""
         self.num_players = num_players
         self.chips: Dict[int, int] = {player_id: 0 for player_id in range(num_players)}
-        self.history: list = []  # Track chip movements
+        self.history: list = []
     
-    def add_chips(self, player_id: int, amount: int, reason: str = ""):
+    def add_chips(self, player_id: int, amount: int, reason: str = "") -> bool:
         """Add chips to a player"""
         if player_id >= self.num_players or player_id < 0:
             raise ValueError(f"Invalid player ID: {player_id}")
@@ -32,12 +36,10 @@ class ChipsSystem:
             'reason': reason,
             'total': self.chips[player_id]
         })
+        return True
     
     def remove_chips(self, player_id: int, amount: int, reason: str = "") -> bool:
-        """
-        Remove chips from a player.
-        Returns True if successful, False if insufficient chips.
-        """
+        """Remove chips from a player. Returns True if successful, False if insufficient."""
         if player_id >= self.num_players or player_id < 0:
             raise ValueError(f"Invalid player ID: {player_id}")
         
@@ -45,7 +47,7 @@ class ChipsSystem:
             raise ValueError(f"Cannot remove negative chips: {amount}")
         
         if self.chips[player_id] < amount:
-            return False  # Insufficient chips
+            return False
         
         self.chips[player_id] -= amount
         self.history.append({
@@ -58,11 +60,7 @@ class ChipsSystem:
         return True
     
     def convert_to_resource(self, player_id: int, amount: int) -> bool:
-        """
-        Convert chips to resources (1:1 ratio).
-        Player must have visible VP equal to the amount being converted.
-        Returns True if successful, False otherwise.
-        """
+        """Convert chips to resources (1:1 ratio). Returns True if successful."""
         if player_id >= self.num_players or player_id < 0:
             raise ValueError(f"Invalid player ID: {player_id}")
         
@@ -70,9 +68,8 @@ class ChipsSystem:
             raise ValueError(f"Cannot convert {amount} chips")
         
         if self.chips[player_id] < amount:
-            return False  # Insufficient chips
+            return False
         
-        # Conversion successful
         self.chips[player_id] -= amount
         self.history.append({
             'action': 'converted',
@@ -84,10 +81,7 @@ class ChipsSystem:
         return True
     
     def trade_chips(self, from_player: int, to_player: int, amount: int) -> bool:
-        """
-        Trade chips between players.
-        Returns True if successful, False otherwise.
-        """
+        """Trade chips between players. Returns True if successful."""
         if from_player >= self.num_players or from_player < 0:
             raise ValueError(f"Invalid player ID: {from_player}")
         
@@ -101,9 +95,8 @@ class ChipsSystem:
             raise ValueError(f"Cannot trade {amount} chips")
         
         if self.chips[from_player] < amount:
-            return False  # Insufficient chips
+            return False
         
-        # Trade successful
         self.chips[from_player] -= amount
         self.chips[to_player] += amount
         
@@ -174,41 +167,34 @@ class ChipsSystem:
         print("="*50 + "\n")
 
 
-# Test/Demo
 if __name__ == "__main__":
     print("\nTesting NodKnaKra Chips System...\n")
     
-    # Create system for 4 players
     chips = ChipsSystem(4)
     print("✓ Created chips system for 4 players")
     
-    # Test earning chips
     print("\n1. Players earn chips from dice rolls:")
     chips.add_chips(0, 3, "Rolled 5, no settlements on 5")
     chips.add_chips(1, 2, "Rolled 8, one settlement on 8")
     chips.add_chips(2, 1, "Rolled 6, two settlements on 6")
     chips.print_status()
     
-    # Test conversion
     print("2. Player 0 converts 2 chips to resources:")
     if chips.convert_to_resource(0, 2):
         print("✓ Conversion successful")
     chips.print_status()
     
-    # Test trading
     print("3. Player 1 trades 1 chip to Player 2:")
     if chips.trade_chips(1, 2, 1):
         print("✓ Trade successful")
     chips.print_status()
     
-    # Test insufficient chips
     print("4. Try to convert more chips than available:")
     if chips.convert_to_resource(0, 10):
         print("✓ Conversion successful")
     else:
         print("✗ Conversion failed (insufficient chips)")
     
-    # Print history
     chips.print_history()
     
     print("✓ Chips system working!")
