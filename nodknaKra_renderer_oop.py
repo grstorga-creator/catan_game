@@ -2,6 +2,7 @@
 Project: NodKnaKra Settlers of Catan
 File: nodknaKra_renderer_oop.py
 EDIT HISTORY (most recent first):
+2026-08-18 - Claude - CRITICAL FIX: Pass hex_size to hex-graph building; added vertex click debug output for coordinate matching
 2026-08-18 - Claude - Increased hex_size from 30 to 42 (+40%); added token_font (24pt) for hex labels; vertices/edges auto-scale
 2026-08-18 - Claude - Increased window to 1400x900; enlarged all fonts (+40%); spelled out full piece names
 2026-08-18 - Claude - Compacted sidebar (moved below top panel, 2-row layouts); increased button sizes
@@ -163,32 +164,79 @@ class PlacementPalette:
         return False
     
     def _has_adjacent_settlement_or_city(self, vertex_id: str, board: 'Game') -> bool:
-        """Check if any adjacent vertices have settlements or cities"""
-        # Find all edges connected to this vertex
-        adjacent_vertices = set()
+        """
+        Check if any vertex within 1 edge has a settlement or city.
+        In Catan, there must be at least ONE EMPTY VERTEX between settlements.
+        This means settlements must be 2+ edges apart.
         
-        for edge_id in board.edges.keys():
-            # Extract vertices from edge_id (format: "x1,y1-x2,y2")
-            try:
-                vertices_str = edge_id.split('-')
-                v1_id = vertices_str[0]
-                v2_id = vertices_str[1]
-            except:
+        Blocked vertices:
+        - Distance 0: The vertex itself
+        - Distance 1: Direct neighbors (adjacent vertices via one edge)
+        Allowed: Distance 2+ (neighbors of neighbors)
+        
+        Uses actual edge objects (not parsing edge_id strings) to ensure accuracy after vertex deduplication.
+        """
+        blocked_vertices = set([vertex_id])  # The vertex itself is blocked
+        
+        # Find direct neighbors (1 edge away) - use actual edge objects
+        direct_neighbors = set()
+        for edge in board.edges.values():
+            if not edge.vertex1 or not edge.vertex2:
                 continue
+            
+            v1_id = edge.vertex1.vertex_id
+            v2_id = edge.vertex2.vertex_id
             
             # If this edge connects to our vertex, add the other vertex
             if v1_id == vertex_id:
-                adjacent_vertices.add(v2_id)
+                direct_neighbors.add(v2_id)
             elif v2_id == vertex_id:
-                adjacent_vertices.add(v1_id)
+                direct_neighbors.add(v1_id)
         
-        # Check if any adjacent vertex has a settlement or city
-        for adj_vertex in adjacent_vertices:
-            if adj_vertex in self.settlements or adj_vertex in self.cities:
-                print(f"[DEBUG ADJACENT] Vertex {adj_vertex} adjacent to {vertex_id} has settlement/city")
+        blocked_vertices.update(direct_neighbors)
+        
+        # Check if any blocked vertex has a settlement or city
+        for blocked_vertex in blocked_vertices:
+            if blocked_vertex in self.settlements or blocked_vertex in self.cities:
+                print(f"[ADJ REJECT] {vertex_id} too close to {blocked_vertex} (has settlement/city)")
                 return True
         
         return False
+        return False
+    
+    def _get_vertex_distance(self, v1_id: str, v2_id: str) -> int:
+        """Calculate minimum edge distance between two vertices"""
+        if v1_id == v2_id:
+            return 0
+        
+        # Simple BFS to find shortest path
+        visited = {v1_id}
+        queue = [(v1_id, 0)]
+        
+        while queue:
+            current, distance = queue.pop(0)
+            if current == v2_id:
+                return distance
+            
+            # Find neighbors
+            for edge_id in self.board.edges.keys() if hasattr(self, 'board') else []:
+                try:
+                    vertices_str = edge_id.split('-')
+                    v1, v2 = vertices_str[0], vertices_str[1]
+                except:
+                    continue
+                
+                neighbor = None
+                if v1 == current:
+                    neighbor = v2
+                elif v2 == current:
+                    neighbor = v1
+                
+                if neighbor and neighbor not in visited:
+                    visited.add(neighbor)
+                    queue.append((neighbor, distance + 1))
+        
+        return float('inf')
     
     def is_valid_road_placement(self, edge_id: str, player: int, board: 'Game') -> bool:
         """
@@ -445,6 +493,15 @@ class HexRenderer:
         closest_vertex = None
         closest_distance = threshold
         
+        # Debug: show first 5 vertices and their coordinates
+        vertex_list = list(board.vertices.items())
+        if len(vertex_list) > 0:
+            print(f"[DEBUG] Sample vertices (first 3):")
+            for vid, v in vertex_list[:3]:
+                print(f"  {vid}: pixel_x={v.pixel_x}, pixel_y={v.pixel_y}")
+        
+        print(f"[DEBUG] Mouse click at: ({mouse_x}, {mouse_y})")
+        
         for vertex_id, vertex in board.vertices.items():
             dx = vertex.pixel_x - mouse_x
             dy = vertex.pixel_y - mouse_y
@@ -454,9 +511,10 @@ class HexRenderer:
                 closest_vertex = vertex_id
         
         if closest_vertex:
-            print(f"[DEBUG] Found vertex {closest_vertex} at distance {closest_distance:.1f} from mouse")
+            v = board.vertices[closest_vertex]
+            print(f"[DEBUG] FOUND vertex {closest_vertex} at pixel ({v.pixel_x}, {v.pixel_y}), distance {closest_distance:.1f}")
         else:
-            print(f"[DEBUG] No vertex found within threshold {threshold}. Closest was {closest_distance:.1f} away")
+            print(f"[DEBUG] NO vertex found within threshold {threshold}. Closest was {closest_distance:.1f} away")
         
         return closest_vertex
     
@@ -966,7 +1024,7 @@ class HexRenderer:
         undo_stack = []  # For undo functionality
         
         print(f"[DEBUG] Board initialized with {len(game.board.vertices)} vertices and {len(game.board.edges)} edges")
-        print(f"[DEBUG] Sidebar width: {self.sidebar_width}, Board starts at x={self.sidebar_width}")
+        print(f"[DEBUG] Renderer hex_size: {self.hex_size}, Sidebar width: {self.sidebar_width}, Board starts at x={self.sidebar_width}")
         
         while running:
             mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -1133,7 +1191,7 @@ def main():
     
     # Now build hex-graph using renderer's hex_to_pixel method
     print("Building hex-graph using renderer coordinates...")
-    game.board.finalize_hex_graph(renderer.hex_to_pixel)
+    game.board.finalize_hex_graph(renderer.hex_to_pixel, hex_size=renderer.hex_size)
     
     # Show ASCII representation
     game.render_ascii()

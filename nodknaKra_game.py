@@ -1,8 +1,19 @@
 """
-NodKnaKra Game - Loads maps, randomizes terrain, and manages board state
+Project: NodKnaKra Settlers of Catan
+File: nodknaKra_game.py
+EDIT HISTORY (most recent first):
+2026-08-18 - Claude - FINAL FIX: Added vertex deduplication pass to merge vertices within 2px (fixes floating-point rounding from trig); ensures perfect adjacency
+2026-08-18 - Claude - CRITICAL MATH FIX: Replace hardcoded 0.866 approximation with trigonometric vertex calculation using cos/sin for perfect rounding
+2026-08-18 - Claude - FIX: Port assignment now handles corner hexes with no coastal edges (fallback to coastal vertices)
+2026-08-18 - Claude - CRITICAL FIX: hex_size now parameter to finalize_hex_graph() and _build_hex_graph(); eliminates hardcoded hex_size=30 mismatch
+2026-08-18 - Claude - Added PlacementPhaseState class for two-player turn tracking (rounds/players/piece order)
+2026-08-17 - Claude - Added _assign_port_vertices_to_harbors() method, moved port assignment to after hex-graph build
+2026-08-17 - Claude - Added port_vertices attribute to GameHex, _assign_port_vertices() and _edge_touches_land() methods
+2026-08-17 - Claude - Initial game logic with maps, terrain randomization, token distribution, harbor assignment
 """
 
 import random
+import math
 from typing import Dict, List, Optional, TYPE_CHECKING
 from nodknaKra_maps_oop import (
     MapConfiguration, HexTemplate, HexType, HarborType,
@@ -105,6 +116,57 @@ class GameHex:
         return f"Hex({self.position}, {self.hex_type.value})"
 
 
+class PlacementPhaseState:
+    """Track state during placement phase (first two rounds)"""
+    
+    def __init__(self):
+        self.current_round = 1  # Round 1 or 2
+        self.current_player = 1  # Player 1 or 2
+        self.building_piece_placed = False  # Settlement or City placed this turn
+        self.road_placed = False  # Road placed this turn
+        self.first_piece_type = None  # "Settlement" or "City"
+        
+        # Play order
+        self.round1_order = [1, 2]  # Player 1 goes first in Round 1
+        self.round2_order = [2, 1]  # Player 2 goes first in Round 2 (reverse)
+    
+    def get_required_piece(self) -> str:
+        """Get what piece this player must place first"""
+        if self.current_round == 1:
+            return "Settlement"  # Round 1 always starts with Settlement
+        else:
+            return "City"  # Round 2 always starts with City
+    
+    def get_second_piece(self) -> str:
+        """Get what piece this player must place second"""
+        first = self.get_required_piece()
+        return "City" if first == "Settlement" else "Settlement"
+    
+    def advance_turn(self) -> bool:
+        """Move to next player's turn. Returns False if placement phase complete."""
+        order = self.round1_order if self.current_round == 1 else self.round2_order
+        current_idx = order.index(self.current_player)
+        
+        if current_idx == len(order) - 1:
+            # End of this round
+            if self.current_round == 1:
+                # Move to Round 2
+                self.current_round = 2
+                self.current_player = self.round2_order[0]
+            else:
+                # Placement phase complete
+                return False
+        else:
+            # Next player this round
+            self.current_player = order[current_idx + 1]
+        
+        # Reset turn flags
+        self.building_piece_placed = False
+        self.road_placed = False
+        self.first_piece_type = None
+        return True
+
+
 class Board:
     """Game board - loaded from map configuration with randomized terrain"""
     
@@ -127,16 +189,22 @@ class Board:
         self._assign_harbors()  # Assign harbors (port vertices assigned later after hex-graph)
         # Hex-graph building deferred until renderer provides hex_to_pixel
     
-    def finalize_hex_graph(self, hex_to_pixel_func):
-        """Build hex-graph using renderer's hex_to_pixel function"""
+    def finalize_hex_graph(self, hex_to_pixel_func, hex_size: int = 42):
+        """Build hex-graph using renderer's hex_to_pixel function
+        
+        Args:
+            hex_to_pixel_func: Function to convert hex position to pixel coordinates
+            hex_size: The hex radius size (must match renderer's hex_size)
+        """
         self.hex_to_pixel_func = hex_to_pixel_func
+        self.hex_size = hex_size  # Store for later use
         
         # Calculate hex positions using renderer's method
         for hex_pos in self.hexes.keys():
             self.hex_to_pixel[hex_pos] = hex_to_pixel_func(hex_pos)
         
         # Now build the vertex/edge graph
-        self._build_hex_graph()
+        self._build_hex_graph(hex_size)
         
         # Assign port vertices to harbor hexes (now that hex-graph exists)
         self._assign_port_vertices_to_harbors()
@@ -149,33 +217,34 @@ class Board:
             self.hexes[template.position] = game_hex
     
 
-    def _build_hex_graph(self):
-        """Build vertices and edges using pre-calculated hex positions"""
+    def _build_hex_graph(self, hex_size: int = 42):
+        """Build vertices and edges using pre-calculated hex positions
+        
+        Args:
+            hex_size: The hex radius size (must match renderer's hex_size)
+        """
         from nodknaKra_vertices_edges import Vertex, Edge
         
-        print(f"[DEBUG] Building hex-graph with geometric vertex positions...")
+        print(f"[DEBUG HG] Building hex-graph with geometric vertex positions (hex_size={hex_size})...")
         
-        hex_size = 30  # radius (must match renderer's hex_size)
-        
-        # Create all vertices with geometric positions
+        # Create all vertices with geometric positions using trigonometry (pointy-top hexagons)
+        vertex_count = 0
         for hex_pos, (hex_x, hex_y) in self.hex_to_pixel.items():
             game_hex = self.hexes[hex_pos]
             
-            # Calculate 6 vertices for this hex (pointy-top orientation)
-            # Using sin/cos: top at 90°, then 60° apart clockwise
-            vertex_positions = {
-                'top': (hex_x, hex_y - hex_size),
-                'top_right': (hex_x + hex_size * 0.866, hex_y - hex_size * 0.5),
-                'bottom_right': (hex_x + hex_size * 0.866, hex_y + hex_size * 0.5),
-                'bottom': (hex_x, hex_y + hex_size),
-                'bottom_left': (hex_x - hex_size * 0.866, hex_y + hex_size * 0.5),
-                'top_left': (hex_x - hex_size * 0.866, hex_y - hex_size * 0.5),
-            }
+            # For pointy-top hexagon, vertices are at 60° increments starting at 270° (top)
+            # Angles: 270°(top), 330°(top-right), 30°(bottom-right), 90°(bottom), 150°(bottom-left), 210°(top-left)
+            vertex_names = ['top', 'top_right', 'bottom_right', 'bottom', 'bottom_left', 'top_left']
+            vertex_positions = {}
             
-            # Create or link to existing vertices
-            for vertex_name, (vx, vy) in vertex_positions.items():
-                # Round coordinates to avoid floating point issues
-                vx, vy = int(round(vx)), int(round(vy))
+            for i, vertex_name in enumerate(vertex_names):
+                # Calculate angle for this vertex
+                angle_deg = 270 + i * 60  # 270, 330, 30, 90, 150, 210 (wraps at 360)
+                angle_rad = math.radians(angle_deg)
+                
+                # Calculate vertex position using trigonometry, then round to integer
+                vx = int(round(hex_x + hex_size * math.cos(angle_rad)))
+                vy = int(round(hex_y + hex_size * math.sin(angle_rad)))
                 vertex_key = f"{vx},{vy}"
                 
                 # Check if this vertex already exists (shared with neighbor)
@@ -186,6 +255,7 @@ class Board:
                         pixel_y=vy
                     )
                     self.vertices[vertex_key] = vertex
+                    vertex_count += 1
                 else:
                     vertex = self.vertices[vertex_key]
                 
@@ -206,7 +276,15 @@ class Board:
                 elif vertex_name == 'top_left':
                     game_hex.vertex_top_left = vertex
         
+        print(f"[DEBUG HG] Created {len(self.vertices)} total vertices ({vertex_count} new)")
+        
+        # DEDUPLICATION PASS: Merge vertices that are within 2 pixels of each other
+        # This fixes floating-point rounding errors from trigonometric calculations
+        print(f"[DEBUG HG] Starting vertex deduplication (tolerance: 2 pixels)...")
+        self._merge_nearby_vertices(tolerance=2)
+        
         # Create edges between adjacent vertices
+        edge_count = 0
         for hex_pos, game_hex in self.hexes.items():
             vertices = game_hex.get_vertices()
             
@@ -222,6 +300,9 @@ class Board:
                     if edge_key not in self.edges:
                         edge = Edge(edge_id=edge_key, vertex1=v1, vertex2=v2)
                         self.edges[edge_key] = edge
+                        edge_count += 1
+                        if hex_pos in ['B2', 'C2']:  # Debug sample hexes
+                            print(f"[DEBUG HG EDGE] {hex_pos}: created edge {edge_key}")
                     else:
                         edge = self.edges[edge_key]
                     
@@ -242,7 +323,11 @@ class Board:
                     elif i == 5:
                         game_hex.edge_top_left = edge
         
-        print(f"[DEBUG] Created {len(self.vertices)} vertices and {len(self.edges)} edges")
+        print(f"[DEBUG HG] Created {len(self.edges)} total edges ({edge_count} new)")
+        print(f"[DEBUG HG] FINAL AFTER DEDUP: {len(self.vertices)} vertices and {len(self.edges)} edges")
+        
+        # Validate that vertices are properly connected
+        self._validate_hex_graph_connections()
     
     def _randomize_terrain(self):
         """Randomize terrain types while keeping desert at D1"""
@@ -303,17 +388,139 @@ class Board:
         print(f"[DEBUG] Distributed {len(tokens)} tokens to {len(terrain_positions)} terrain hexes")
         print(f"[DEBUG] Token distribution: {dict(zip(token_values, token_counts))}")
     
+    def _validate_hex_graph_connections(self):
+        """Validate that adjacent vertices are connected by edges"""
+        print(f"\n[DEBUG HG VALIDATION] Checking vertex connectivity...")
+        
+        # CRITICAL CHECK: Make sure all edges point to vertices that still exist
+        print(f"[DEBUG HG VALIDATION] Checking edge/vertex consistency...")
+        invalid_edges = 0
+        for edge_id, edge in self.edges.items():
+            if not edge.vertex1 or not edge.vertex2:
+                print(f"[ERROR] Edge {edge_id} has None vertex!")
+                invalid_edges += 1
+            elif edge.vertex1.vertex_id not in self.vertices:
+                print(f"[ERROR] Edge {edge_id}: vertex1 {edge.vertex1.vertex_id} not in vertices dict!")
+                invalid_edges += 1
+            elif edge.vertex2.vertex_id not in self.vertices:
+                print(f"[ERROR] Edge {edge_id}: vertex2 {edge.vertex2.vertex_id} not in vertices dict!")
+                invalid_edges += 1
+        
+        if invalid_edges > 0:
+            print(f"[ERROR] Found {invalid_edges} invalid edges!")
+        else:
+            print(f"[OK] All {len(self.edges)} edges point to valid vertices")
+        
+        # Check a few specific vertices to see if they're connected
+        test_vertices = list(self.vertices.items())[:10]  # Sample first 10 vertices
+        
+        for vertex_id, vertex in test_vertices:
+            # Find all edges containing this vertex
+            connected_vertices = set()
+            for edge_id, edge in self.edges.items():
+                if edge.vertex1 and edge.vertex1.vertex_id == vertex_id:
+                    connected_vertices.add(edge.vertex2.vertex_id)
+                elif edge.vertex2 and edge.vertex2.vertex_id == vertex_id:
+                    connected_vertices.add(edge.vertex1.vertex_id)
+            
+            print(f"[DEBUG HG VAL] Vertex {vertex_id}: connected to {len(connected_vertices)} vertices: {connected_vertices}")
+            
+            # For vertices with hexes, print which hexes they touch
+            if hasattr(vertex, 'hex_positions'):
+                print(f"[DEBUG HG VAL]   Touches hexes: {vertex.hex_positions}")
+    
+    def _merge_nearby_vertices(self, tolerance: int = 2):
+        """
+        Merge vertices that are within tolerance pixels of each other.
+        This fixes floating-point rounding errors from trigonometric calculations.
+        Adjacent hexes may calculate vertices at slightly different coordinates.
+        """
+        print(f"[DEBUG MERGE] Deduplicating vertices with tolerance={tolerance}px...")
+        
+        vertices_list = list(self.vertices.items())
+        merged_count = 0
+        skip_indices = set()  # Indices of vertices already merged
+        
+        # For each vertex, check if any other vertex is within tolerance
+        for i, (vid1, v1) in enumerate(vertices_list):
+            if i in skip_indices:
+                continue
+            
+            # Find all vertices within tolerance of this one
+            nearby_indices = [i]
+            for j in range(i + 1, len(vertices_list)):
+                if j in skip_indices:
+                    continue
+                
+                vid2, v2 = vertices_list[j]
+                dx = v1.pixel_x - v2.pixel_x
+                dy = v1.pixel_y - v2.pixel_y
+                distance = (dx*dx + dy*dy) ** 0.5
+                
+                if distance <= tolerance:
+                    nearby_indices.append(j)
+            
+            # If we found duplicates, merge them
+            if len(nearby_indices) > 1:
+                # Use the first vertex as the canonical one
+                canonical_vid = vertices_list[nearby_indices[0]][0]
+                canonical_vertex = self.vertices[canonical_vid]
+                
+                # Merge all duplicates into the canonical vertex
+                for idx in nearby_indices[1:]:
+                    dup_vid, dup_vertex = vertices_list[idx]
+                    
+                    # Merge hex positions
+                    if hasattr(canonical_vertex, 'hex_positions'):
+                        canonical_vertex.hex_positions.update(dup_vertex.hex_positions)
+                    
+                    # Update all edges pointing to the duplicate to point to canonical
+                    for edge_id, edge in list(self.edges.items()):
+                        if edge.vertex1 and edge.vertex1.vertex_id == dup_vid:
+                            edge.vertex1 = canonical_vertex
+                        if edge.vertex2 and edge.vertex2.vertex_id == dup_vid:
+                            edge.vertex2 = canonical_vertex
+                    
+                    # Update all hex references
+                    for hex_obj in self.hexes.values():
+                        if hex_obj.vertex_top and hex_obj.vertex_top.vertex_id == dup_vid:
+                            hex_obj.vertex_top = canonical_vertex
+                        if hex_obj.vertex_top_right and hex_obj.vertex_top_right.vertex_id == dup_vid:
+                            hex_obj.vertex_top_right = canonical_vertex
+                        if hex_obj.vertex_bottom_right and hex_obj.vertex_bottom_right.vertex_id == dup_vid:
+                            hex_obj.vertex_bottom_right = canonical_vertex
+                        if hex_obj.vertex_bottom and hex_obj.vertex_bottom.vertex_id == dup_vid:
+                            hex_obj.vertex_bottom = canonical_vertex
+                        if hex_obj.vertex_bottom_left and hex_obj.vertex_bottom_left.vertex_id == dup_vid:
+                            hex_obj.vertex_bottom_left = canonical_vertex
+                        if hex_obj.vertex_top_left and hex_obj.vertex_top_left.vertex_id == dup_vid:
+                            hex_obj.vertex_top_left = canonical_vertex
+                    
+                    # Remove the duplicate vertex
+                    del self.vertices[dup_vid]
+                    skip_indices.add(idx)
+                    merged_count += 1
+                    print(f"[DEBUG MERGE] Merged {dup_vid} into {canonical_vid}")
+        
+        print(f"[DEBUG MERGE] Deduplication complete: merged {merged_count} vertices")
+        print(f"[DEBUG MERGE] Final vertex count: {len(self.vertices)}")
+    
     def _assign_port_vertices_to_harbors(self):
         """Assign port vertices to all harbor hexes"""
+        print(f"[DEBUG PORT INIT] Starting port assignment for {len([h for h in self.get_water_hexes() if h.harbor])} harbor hexes")
         for water_hex in self.get_water_hexes():
             if water_hex.harbor:
                 self._assign_port_vertices(water_hex)
-                print(f"[DEBUG PORT] Harbor hex {water_hex.position} ({water_hex.harbor.value}): vertices {water_hex.port_vertices}")
+                if water_hex.port_vertices:
+                    print(f"[DEBUG PORT SUCCESS] Harbor hex {water_hex.position} ({water_hex.harbor.value}): vertices {water_hex.port_vertices}")
+                else:
+                    print(f"[DEBUG PORT FAILED] Harbor hex {water_hex.position} ({water_hex.harbor.value}): NO VERTICES ASSIGNED")
     
     def _assign_port_vertices(self, water_hex: GameHex):
         """
         Assign 2 port vertices to a harbor hex.
-        Port vertices are the endpoints of an edge that borders both the water hex and a land hex.
+        Port vertices are endpoints of an edge that borders both water and land.
+        For corner hexes with no coastal edges, pick 2 random coastal vertices.
         """
         hex_edges = water_hex.get_edges()
         hex_edges = [e for e in hex_edges if e is not None]
@@ -328,23 +535,41 @@ class Board:
             if self._edge_touches_land(edge.edge_id):
                 coastal_edges.append(edge)
         
-        if not coastal_edges:
-            print(f"[WARNING] Harbor hex {water_hex.position} has no coastal edges")
-            return
-        
-        # Randomly pick one coastal edge for the port
-        port_edge = random.choice(coastal_edges)
-        
-        # The port vertices are the two endpoints of this edge
-        # Extract from edge_id (format: "x1,y1-x2,y2")
-        try:
-            vertices_str = port_edge.edge_id.split('-')
-            vertex_1_id = vertices_str[0]
-            vertex_2_id = vertices_str[1]
-            water_hex.port_vertices = (vertex_1_id, vertex_2_id)
-            print(f"[DEBUG PORT] Harbor hex {water_hex.position} assigned port edge {port_edge.edge_id} with vertices {vertex_1_id}, {vertex_2_id}")
-        except Exception as e:
-            print(f"[WARNING] Error parsing port edge {port_edge.edge_id}: {e}")
+        if coastal_edges:
+            # Normal case: pick a coastal edge
+            port_edge = random.choice(coastal_edges)
+            try:
+                vertices_str = port_edge.edge_id.split('-')
+                vertex_1_id = vertices_str[0]
+                vertex_2_id = vertices_str[1]
+                water_hex.port_vertices = (vertex_1_id, vertex_2_id)
+                print(f"[DEBUG PORT] Harbor hex {water_hex.position} assigned port edge {port_edge.edge_id} with vertices {vertex_1_id}, {vertex_2_id}")
+            except Exception as e:
+                print(f"[WARNING] Error parsing port edge {port_edge.edge_id}: {e}")
+        else:
+            # Corner case: no coastal edges. Find coastal vertices instead.
+            print(f"[DEBUG PORT] Harbor hex {water_hex.position} has no coastal edges, finding coastal vertices...")
+            coastal_vertices = []
+            
+            # Get all vertices of this water hex
+            for edge in hex_edges:
+                if edge.vertex1 and self._vertex_touches_land(edge.vertex1):
+                    coastal_vertices.append(edge.vertex1)
+                if edge.vertex2 and self._vertex_touches_land(edge.vertex2):
+                    coastal_vertices.append(edge.vertex2)
+            
+            # Remove duplicates
+            coastal_vertices = list(set(coastal_vertices))
+            
+            if len(coastal_vertices) >= 2:
+                # Pick 2 random coastal vertices
+                selected = random.sample(coastal_vertices, min(2, len(coastal_vertices)))
+                vertex_1_id = f"{selected[0].pixel_x},{selected[0].pixel_y}"
+                vertex_2_id = f"{selected[1].pixel_x},{selected[1].pixel_y}"
+                water_hex.port_vertices = (vertex_1_id, vertex_2_id)
+                print(f"[DEBUG PORT] Harbor hex {water_hex.position} assigned coastal vertices {vertex_1_id}, {vertex_2_id}")
+            else:
+                print(f"[WARNING] Harbor hex {water_hex.position} has no coastal vertices either")
     
     def _edge_touches_land(self, edge_id: str) -> bool:
         """Check if an edge touches at least one land hex"""
@@ -357,6 +582,19 @@ class Board:
             for hex_edge in hex_edges:
                 if hex_edge and hex_edge.edge_id == edge_id:
                     # Found a hex that contains this edge
+                    if hex_obj.hex_type not in [HexType.WATER, HexType.DESERT]:
+                        return True  # Found at least one land hex
+        
+        return False  # Only water/desert hexes
+    
+    def _vertex_touches_land(self, vertex) -> bool:
+        """Check if a vertex is adjacent to at least one land hex"""
+        # Find all hexes that share this vertex
+        for hex_obj in self.hexes.values():
+            hex_vertices = hex_obj.get_vertices()
+            for hex_vertex in hex_vertices:
+                if hex_vertex and hex_vertex.pixel_x == vertex.pixel_x and hex_vertex.pixel_y == vertex.pixel_y:
+                    # Found a hex that contains this vertex
                     if hex_obj.hex_type not in [HexType.WATER, HexType.DESERT]:
                         return True  # Found at least one land hex
         

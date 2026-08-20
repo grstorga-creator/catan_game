@@ -38,32 +38,36 @@ Loading STANDARD map (seed=42)...
 [DEBUG] Loaded card image for ore: ore_card_40x55.jpg
 [DEBUG] Loaded card image for wheat: wheat_card_40x55.jpg
 Building hex-graph using renderer coordinates...
-[DEBUG] Building hex-graph with geometric vertex positions...
-[DEBUG] Created 158 vertices and 214 edges
-[DEBUG PORT] Harbor hex A1 assigned port edge 344,265-370,250 with vertices 344,265, 370,250
-[DEBUG PORT] Harbor hex A1 (Wheat 2:1): vertices ('344,265', '370,250')
-[DEBUG PORT] Harbor hex A3 assigned port edge 422,250-448,265 with vertices 422,250, 448,265
-[DEBUG PORT] Harbor hex A3 (3:1): vertices ('422,250', '448,265')
-[DEBUG PORT] Harbor hex A5 assigned port edge 551,265-577,250 with vertices 551,265, 577,250
-[DEBUG PORT] Harbor hex A5 (Sheep 2:1): vertices ('551,265', '577,250')
-[DEBUG PORT] Harbor hex A7 assigned port edge 629,250-655,265 with vertices 629,250, 655,265
-[DEBUG PORT] Harbor hex A7 (3:1): vertices ('629,250', '655,265')
-[DEBUG PORT] Harbor hex C1 assigned port edge 318,310-318,340 with vertices 318,310, 318,340
-[DEBUG PORT] Harbor hex C1 (3:1): vertices ('318,310', '318,340')
-[DEBUG PORT] Harbor hex C9 assigned port edge 681,310-681,340 with vertices 681,310, 681,340
-[DEBUG PORT] Harbor hex C9 (Ore 2:1): vertices ('681,310', '681,340')
-[DEBUG PORT] Harbor hex E1 assigned port edge 318,400-318,430 with vertices 318,400, 318,430
-[DEBUG PORT] Harbor hex E1 (Brick 2:1): vertices ('318,400', '318,430')
-[DEBUG PORT] Harbor hex E9 assigned port edge 681,400-707,385 with vertices 681,400, 707,385
-[DEBUG PORT] Harbor hex E9 (3:1): vertices ('681,400', '707,385')
-[DEBUG PORT] Harbor hex G1 assigned port edge 344,475-370,490 with vertices 344,475, 370,490
-[DEBUG PORT] Harbor hex G1 (3:1): vertices ('344,475', '370,490')
-[DEBUG PORT] Harbor hex G3 assigned port edge 448,475-474,490 with vertices 448,475, 474,490
-[DEBUG PORT] Harbor hex G3 (Wood 2:1): vertices ('448,475', '474,490')
-[DEBUG PORT] Harbor hex G5 assigned port edge 525,490-551,475 with vertices 525,490, 551,475
-[DEBUG PORT] Harbor hex G5 (3:1): vertices ('525,490', '551,475')
-[DEBUG PORT] Harbor hex G7 assigned port edge 629,490-655,475 with vertices 629,490, 655,475
-[DEBUG PORT] Harbor hex G7 (Sheep 2:1): vertices ('629,490', '655,475')
+[DEBUG] Building hex-graph with geometric vertex positions (hex_size=42)...
+[DEBUG] Created 222 vertices and 272 edges
+[DEBUG PORT] Harbor hex A1 has no coastal edges, finding coastal vertices...
+[WARNING] Harbor hex A1 has no coastal vertices either
+[DEBUG PORT] Harbor hex A1 (Wheat 2:1): vertices None
+[DEBUG PORT] Harbor hex A3 assigned port edge 627,323-663,302 with vertices 627,323, 663,302
+[DEBUG PORT] Harbor hex A3 (3:1): vertices ('627,323', '663,302')
+[DEBUG PORT] Harbor hex A5 assigned port edge 736,302-772,323 with vertices 736,302, 772,323
+[DEBUG PORT] Harbor hex A5 (Sheep 2:1): vertices ('736,302', '772,323')
+[DEBUG PORT] Harbor hex A7 has no coastal edges, finding coastal vertices...
+[WARNING] Harbor hex A7 has no coastal vertices either
+[DEBUG PORT] Harbor hex A7 (3:1): vertices None
+[DEBUG PORT] Harbor hex C1 assigned port edge 445,386-445,428 with vertices 445,386, 445,428
+[DEBUG PORT] Harbor hex C1 (3:1): vertices ('445,386', '445,428')
+[DEBUG PORT] Harbor hex C9 assigned port edge 954,428-990,449 with vertices 954,428, 990,449
+[DEBUG PORT] Harbor hex C9 (Ore 2:1): vertices ('954,428', '990,449')
+[DEBUG PORT] Harbor hex E1 assigned port edge 445,512-445,554 with vertices 445,512, 445,554
+[DEBUG PORT] Harbor hex E1 (Brick 2:1): vertices ('445,512', '445,554')
+[DEBUG PORT] Harbor hex E9 assigned port edge 954,512-990,491 with vertices 954,512, 990,491
+[DEBUG PORT] Harbor hex E9 (3:1): vertices ('954,512', '990,491')
+[DEBUG PORT] Harbor hex G1 has no coastal edges, finding coastal vertices...
+[WARNING] Harbor hex G1 has no coastal vertices either
+[DEBUG PORT] Harbor hex G1 (3:1): vertices None
+[DEBUG PORT] Harbor hex G3 assigned port edge 627,617-663,638 with vertices 627,617, 663,638
+[DEBUG PORT] Harbor hex G3 (Wood 2:1): vertices ('627,617', '663,638')
+[DEBUG PORT] Harbor hex G5 assigned port edge 736,638-772,617 with vertices 736,638, 772,617
+[DEBUG PORT] Harbor hex G5 (3:1): vertices ('736,638', '772,617')
+[DEBUG PORT] Harbor hex G7 has no coastal edges, finding coastal vertices...
+[WARNING] Harbor hex G7 has no coastal vertices either
+[DEBUG PORT] Harbor hex G7 (Sheep 2:1): vertices None
 
 ======================================================================
 BOARD: STANDARD
@@ -83,8 +87,250 @@ Harbor hexes: 12
 Total hexes: 58
 
 Rendering standard map with vertices, edges, and harbors...
-Hex-graph: 158 vertices, 214 edges
+Hex-graph: 222 vertices, 272 edges
 (Press ESC to exit)
 
-[DEBUG] Board initialized with 158 vertices and 214 edges
-[DEBUG] Sidebar width: 200, Board starts at x=200
+[DEBUG] Board initialized with 222 vertices and 272 edges
+[DEBUG] Renderer hex_size: 42, Sidebar width: 200, Board starts at x=200
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (482, 366)
+[DEBUG] FOUND vertex 482,365 at pixel (482, 365), distance 1.0
+[DEBUG] Clicked on board, looking for vertex at (482, 366), found: 482,365
+[DEBUG SETTLEMENT] Placed settlement at 482,365 for player 1
+[DEBUG] Placed settlement at 482,365 for player 1
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (484, 325)
+[DEBUG] FOUND vertex 482,323 at pixel (482, 323), distance 2.8
+[DEBUG] Clicked on board, looking for vertex at (484, 325), found: 482,323
+[DEBUG ADJACENT] Vertex 482,365 too close to 482,323 (distance: inf) has settlement/city
+[DEBUG SETTLEMENT] Cannot place settlement at 482,323 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 482,323
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (519, 306)
+[DEBUG] FOUND vertex 518,302 at pixel (518, 302), distance 4.1
+[DEBUG] Clicked on board, looking for vertex at (519, 306), found: 518,302
+[DEBUG ADJACENT] Vertex 482,365 too close to 518,302 (distance: inf) has settlement/city
+[DEBUG SETTLEMENT] Cannot place settlement at 518,302 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 518,302
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (554, 324)
+[DEBUG] FOUND vertex 554,323 at pixel (554, 323), distance 1.0
+[DEBUG] Clicked on board, looking for vertex at (554, 324), found: 554,323
+[DEBUG SETTLEMENT] Placed settlement at 554,323 for player 1
+[DEBUG] Placed settlement at 554,323 for player 1
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (516, 426)
+[DEBUG] FOUND vertex 517,428 at pixel (517, 428), distance 2.2
+[DEBUG] Clicked on board, looking for vertex at (516, 426), found: 517,428
+[DEBUG SETTLEMENT] Placed settlement at 517,428 for player 1
+[DEBUG] Placed settlement at 517,428 for player 1
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (484, 449)
+[DEBUG] FOUND vertex 482,449 at pixel (482, 449), distance 2.0
+[DEBUG] Clicked on board, looking for vertex at (484, 449), found: 482,449
+[DEBUG SETTLEMENT] Placed settlement at 482,449 for player 1
+[DEBUG] Placed settlement at 482,449 for player 1
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (481, 490)
+[DEBUG] FOUND vertex 481,491 at pixel (481, 491), distance 1.0
+[DEBUG] Clicked on board, looking for vertex at (481, 490), found: 481,491
+[DEBUG ADJACENT] Vertex 517,428 too close to 481,491 (distance: inf) has settlement/city
+[DEBUG SETTLEMENT] Cannot place settlement at 481,491 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 481,491
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (516, 510)
+[DEBUG] FOUND vertex 517,512 at pixel (517, 512), distance 2.2
+[DEBUG] Clicked on board, looking for vertex at (516, 510), found: 517,512
+[DEBUG SETTLEMENT] Placed settlement at 517,512 for player 1
+[DEBUG] Placed settlement at 517,512 for player 1
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (517, 554)
+[DEBUG] FOUND vertex 517,554 at pixel (517, 554), distance 0.0
+[DEBUG] Clicked on board, looking for vertex at (517, 554), found: 517,554
+[DEBUG ADJACENT] Vertex 517,512 too close to 517,554 (distance: inf) has settlement/city
+[DEBUG SETTLEMENT] Cannot place settlement at 517,554 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 517,554
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (479, 573)
+[DEBUG] FOUND vertex 481,575 at pixel (481, 575), distance 2.8
+[DEBUG] Clicked on board, looking for vertex at (479, 573), found: 481,575
+[DEBUG ADJACENT] Vertex 517,512 too close to 481,575 (distance: inf) has settlement/city
+[DEBUG SETTLEMENT] Cannot place settlement at 481,575 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 481,575
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (482, 575)
+[DEBUG] FOUND vertex 482,575 at pixel (482, 575), distance 0.0
+[DEBUG] Clicked on board, looking for vertex at (482, 575), found: 482,575
+[DEBUG SETTLEMENT] Placed settlement at 482,575 for player 1
+[DEBUG] Placed settlement at 482,575 for player 1
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (484, 620)
+[DEBUG] FOUND vertex 482,617 at pixel (482, 617), distance 3.6
+[DEBUG] Clicked on board, looking for vertex at (484, 620), found: 482,617
+[DEBUG ADJACENT] Vertex 482,575 too close to 482,617 (distance: inf) has settlement/city
+[DEBUG SETTLEMENT] Cannot place settlement at 482,617 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 482,617
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (482, 618)
+[DEBUG] FOUND vertex 482,617 at pixel (482, 617), distance 1.0
+[DEBUG] Clicked on board, looking for vertex at (482, 618), found: 482,617
+[DEBUG ADJACENT] Vertex 482,575 too close to 482,617 (distance: inf) has settlement/city
+[DEBUG SETTLEMENT] Cannot place settlement at 482,617 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 482,617
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (517, 639)
+[DEBUG] FOUND vertex 517,638 at pixel (517, 638), distance 1.0
+[DEBUG] Clicked on board, looking for vertex at (517, 639), found: 517,638
+[DEBUG SETTLEMENT] Placed settlement at 517,638 for player 1
+[DEBUG] Placed settlement at 517,638 for player 1
+[DEBUG] Clicked on board, looking for road at (484, 590), found edge: 481,575-481,617
+[DEBUG LAND] Edge 481,575-481,617 only touches water
+[DEBUG ROAD] Edge 481,575-481,617 only touches water
+[DEBUG] Road placement INVALID - not connected to settlement/city/road for player 1
+[DEBUG] Clicked on board, looking for road at (483, 594), found edge: 481,575-481,617
+[DEBUG LAND] Edge 481,575-481,617 only touches water
+[DEBUG ROAD] Edge 481,575-481,617 only touches water
+[DEBUG] Road placement INVALID - not connected to settlement/city/road for player 1
+[DEBUG] Clicked on board, looking for road at (483, 594), found edge: 481,575-481,617
+[DEBUG LAND] Edge 481,575-481,617 only touches water
+[DEBUG ROAD] Edge 481,575-481,617 only touches water
+[DEBUG] Road placement INVALID - not connected to settlement/city/road for player 1
+[DEBUG] Clicked on board, looking for road at (483, 594), found edge: 481,575-481,617
+[DEBUG LAND] Edge 481,575-481,617 only touches water
+[DEBUG ROAD] Edge 481,575-481,617 only touches water
+[DEBUG] Road placement INVALID - not connected to settlement/city/road for player 1
+[DEBUG] Clicked on board, looking for road at (483, 594), found edge: 481,575-481,617
+[DEBUG LAND] Edge 481,575-481,617 only touches water
+[DEBUG ROAD] Edge 481,575-481,617 only touches water
+[DEBUG] Road placement INVALID - not connected to settlement/city/road for player 1
+[DEBUG] Clicked on board, looking for road at (483, 594), found edge: 481,575-481,617
+[DEBUG LAND] Edge 481,575-481,617 only touches water
+[DEBUG ROAD] Edge 481,575-481,617 only touches water
+[DEBUG] Road placement INVALID - not connected to settlement/city/road for player 1
+[DEBUG] Clicked on board, looking for road at (491, 622), found edge: 482,617-518,638
+[DEBUG LAND] Edge 482,617-518,638 touches land hex F2 (HexType.BRICK)
+[DEBUG ROAD] Edge 482,617-518,638 has vertices: 482,617, 518,638
+[DEBUG ROAD] Settlements: {'482,365': 1, '554,323': 1, '517,428': 1, '482,449': 1, '517,512': 1, '482,575': 1, '517,638': 1}
+[DEBUG ROAD] Cities: {}
+[DEBUG ROAD] Checking vertex 482,617 for player 1
+[DEBUG ROAD] Checking vertex 518,638 for player 1
+[DEBUG ROAD] No valid connection found for edge 482,617-518,638
+[DEBUG] Road placement INVALID - not connected to settlement/city/road for player 1
+[DEBUG] Clicked on board, looking for road at (493, 623), found edge: 482,617-518,638
+[DEBUG LAND] Edge 482,617-518,638 touches land hex F2 (HexType.BRICK)
+[DEBUG ROAD] Edge 482,617-518,638 has vertices: 482,617, 518,638
+[DEBUG ROAD] Settlements: {'482,365': 1, '554,323': 1, '517,428': 1, '482,449': 1, '517,512': 1, '482,575': 1, '517,638': 1}
+[DEBUG ROAD] Cities: {}
+[DEBUG ROAD] Checking vertex 482,617 for player 1
+[DEBUG ROAD] Checking vertex 518,638 for player 1
+[DEBUG ROAD] No valid connection found for edge 482,617-518,638
+[DEBUG] Road placement INVALID - not connected to settlement/city/road for player 1
+[DEBUG] Clicked on board, looking for road at (493, 623), found edge: 482,617-518,638
+[DEBUG LAND] Edge 482,617-518,638 touches land hex F2 (HexType.BRICK)
+[DEBUG ROAD] Edge 482,617-518,638 has vertices: 482,617, 518,638
+[DEBUG ROAD] Settlements: {'482,365': 1, '554,323': 1, '517,428': 1, '482,449': 1, '517,512': 1, '482,575': 1, '517,638': 1}
+[DEBUG ROAD] Cities: {}
+[DEBUG ROAD] Checking vertex 482,617 for player 1
+[DEBUG ROAD] Checking vertex 518,638 for player 1
+[DEBUG ROAD] No valid connection found for edge 482,617-518,638
+[DEBUG] Road placement INVALID - not connected to settlement/city/road for player 1
+[DEBUG] Clicked on board, looking for road at (540, 629), found edge: 518,638-554,617
+[DEBUG LAND] Edge 518,638-554,617 touches land hex F2 (HexType.BRICK)
+[DEBUG ROAD] Edge 518,638-554,617 has vertices: 518,638, 554,617
+[DEBUG ROAD] Settlements: {'482,365': 1, '554,323': 1, '517,428': 1, '482,449': 1, '517,512': 1, '482,575': 1, '517,638': 1}
+[DEBUG ROAD] Cities: {}
+[DEBUG ROAD] Checking vertex 518,638 for player 1
+[DEBUG ROAD] Checking vertex 554,617 for player 1
+[DEBUG ROAD] No valid connection found for edge 518,638-554,617
+[DEBUG] Road placement INVALID - not connected to settlement/city/road for player 1
+[DEBUG] Clicked on board, looking for road at (540, 629), found edge: 518,638-554,617
+[DEBUG LAND] Edge 518,638-554,617 touches land hex F2 (HexType.BRICK)
+[DEBUG ROAD] Edge 518,638-554,617 has vertices: 518,638, 554,617
+[DEBUG ROAD] Settlements: {'482,365': 1, '554,323': 1, '517,428': 1, '482,449': 1, '517,512': 1, '482,575': 1, '517,638': 1}
+[DEBUG ROAD] Cities: {}
+[DEBUG ROAD] Checking vertex 518,638 for player 1
+[DEBUG ROAD] Checking vertex 554,617 for player 1
+[DEBUG ROAD] No valid connection found for edge 518,638-554,617
+[DEBUG] Road placement INVALID - not connected to settlement/city/road for player 1
+[DEBUG] Clicked on board, looking for road at (484, 337), found edge: 481,323-481,365
+[DEBUG LAND] Edge 481,323-481,365 only touches water
+[DEBUG ROAD] Edge 481,323-481,365 only touches water
+[DEBUG] Road placement INVALID - not connected to settlement/city/road for player 1
+[DEBUG] Clicked on board, looking for road at (484, 337), found edge: 481,323-481,365
+[DEBUG LAND] Edge 481,323-481,365 only touches water
+[DEBUG ROAD] Edge 481,323-481,365 only touches water
+[DEBUG] Road placement INVALID - not connected to settlement/city/road for player 1
+[DEBUG] Clicked on board, looking for road at (482, 335), found edge: 481,323-481,365
+[DEBUG LAND] Edge 481,323-481,365 only touches water
+[DEBUG ROAD] Edge 481,323-481,365 only touches water
+[DEBUG] Road placement INVALID - not connected to settlement/city/road for player 1
+[DEBUG] Clicked on board, looking for road at (465, 376), found edge: 445,386-481,365
+[DEBUG LAND] Edge 445,386-481,365 touches land hex C2 (HexType.BRICK)
+[DEBUG ROAD] Edge 445,386-481,365 has vertices: 445,386, 481,365
+[DEBUG ROAD] Settlements: {'482,365': 1, '554,323': 1, '517,428': 1, '482,449': 1, '517,512': 1, '482,575': 1, '517,638': 1}
+[DEBUG ROAD] Cities: {}
+[DEBUG ROAD] Checking vertex 445,386 for player 1
+[DEBUG ROAD] Checking vertex 481,365 for player 1
+[DEBUG ROAD] No valid connection found for edge 445,386-481,365
+[DEBUG] Road placement INVALID - not connected to settlement/city/road for player 1
+[DEBUG] Clicked on board, looking for road at (507, 380), found edge: 482,365-518,386
+[DEBUG LAND] Edge 482,365-518,386 touches land hex B2 (HexType.SHEEP)
+[DEBUG ROAD] Edge 482,365-518,386 has vertices: 482,365, 518,386
+[DEBUG ROAD] Settlements: {'482,365': 1, '554,323': 1, '517,428': 1, '482,449': 1, '517,512': 1, '482,575': 1, '517,638': 1}
+[DEBUG ROAD] Cities: {}
+[DEBUG ROAD] Checking vertex 482,365 for player 1
+[DEBUG ROAD] Found settlement at 482,365 owned by player 1
+[DEBUG ROAD] Settlement matches player 1 - VALID!
+[DEBUG] Placed road on edge 482,365-518,386 for player 1
+[DEBUG] Clicked on board, looking for road at (517, 400), found edge: 517,386-517,428
+[DEBUG LAND] Edge 517,386-517,428 touches land hex C2 (HexType.BRICK)
+[DEBUG ROAD] Edge 517,386-517,428 has vertices: 517,386, 517,428
+[DEBUG ROAD] Settlements: {'482,365': 1, '554,323': 1, '517,428': 1, '482,449': 1, '517,512': 1, '482,575': 1, '517,638': 1}
+[DEBUG ROAD] Cities: {}
+[DEBUG ROAD] Checking vertex 517,386 for player 1
+[DEBUG ROAD] Checking vertex 517,428 for player 1
+[DEBUG ROAD] Found settlement at 517,428 owned by player 1
+[DEBUG ROAD] Settlement matches player 1 - VALID!
+[DEBUG] Placed road on edge 517,386-517,428 for player 1

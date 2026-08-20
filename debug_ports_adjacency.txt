@@ -1,0 +1,380 @@
+pygame 2.6.1 (SDL 2.28.4, Python 3.12.0)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+
+Loading STANDARD map (seed=42)...
+[DEBUG] Randomized terrain for 33 hexes
+[DEBUG] Distributed 33 tokens to 33 terrain hexes
+[DEBUG] Token distribution: {2: 1, 3: 2, 4: 4, 5: 5, 6: 5, 8: 5, 9: 4, 10: 4, 11: 2, 12: 1}
+[DEBUG] Perimeter water hexes (24): ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'B8', 'C9', 'D10', 'E9', 'F8', 'G7', 'G6', 'G5', 'G4', 'G3', 'G2', 'G1', 'F1', 'E1', 'D2', 'C1', 'B1']
+[DEBUG] Position 0 (A1): Wheat 2:1
+[DEBUG] Position 1 (A2): plain water
+[DEBUG] Position 2 (A3): 3:1
+[DEBUG] Position 3 (A4): plain water
+[DEBUG] Position 4 (A5): Sheep 2:1
+[DEBUG] Position 5 (A6): plain water
+[DEBUG] Position 6 (A7): 3:1
+[DEBUG] Position 7 (B8): plain water
+[DEBUG] Position 8 (C9): Ore 2:1
+[DEBUG] Position 9 (D10): plain water
+[DEBUG] Position 10 (E9): 3:1
+[DEBUG] Position 11 (F8): plain water
+[DEBUG] Position 12 (G7): Sheep 2:1
+[DEBUG] Position 13 (G6): plain water
+[DEBUG] Position 14 (G5): 3:1
+[DEBUG] Position 15 (G4): plain water
+[DEBUG] Position 16 (G3): Wood 2:1
+[DEBUG] Position 17 (G2): plain water
+[DEBUG] Position 18 (G1): 3:1
+[DEBUG] Position 19 (F1): plain water
+[DEBUG] Position 20 (E1): Brick 2:1
+[DEBUG] Position 21 (D2): plain water
+[DEBUG] Position 22 (C1): 3:1
+[DEBUG] Position 23 (B1): plain water
+[DEBUG] Assigned 6 specific 2:1 harbors (of 6 available)
+[DEBUG] Assigned 6 generic 3:1 harbors (of 6 available)
+[DEBUG] Loaded card image for wood: wood_card_40x55.jpg
+[DEBUG] Loaded card image for brick: brick_card_40x55.jpg
+[DEBUG] Loaded card image for sheep: sheep_card_40x55.jpg
+[DEBUG] Loaded card image for ore: ore_card_40x55.jpg
+[DEBUG] Loaded card image for wheat: wheat_card_40x55.jpg
+Building hex-graph using renderer coordinates...
+[DEBUG] Building hex-graph with geometric vertex positions (hex_size=42)...
+[DEBUG] Created 222 vertices and 272 edges
+[DEBUG PORT INIT] Starting port assignment for 12 harbor hexes
+[DEBUG PORT] Harbor hex A1 has no coastal edges, finding coastal vertices...
+[WARNING] Harbor hex A1 has no coastal vertices either
+[DEBUG PORT FAILED] Harbor hex A1 (Wheat 2:1): NO VERTICES ASSIGNED
+[DEBUG PORT] Harbor hex A3 assigned port edge 627,323-663,302 with vertices 627,323, 663,302
+[DEBUG PORT SUCCESS] Harbor hex A3 (3:1): vertices ('627,323', '663,302')
+[DEBUG PORT] Harbor hex A5 assigned port edge 736,302-772,323 with vertices 736,302, 772,323
+[DEBUG PORT SUCCESS] Harbor hex A5 (Sheep 2:1): vertices ('736,302', '772,323')
+[DEBUG PORT] Harbor hex A7 has no coastal edges, finding coastal vertices...
+[WARNING] Harbor hex A7 has no coastal vertices either
+[DEBUG PORT FAILED] Harbor hex A7 (3:1): NO VERTICES ASSIGNED
+[DEBUG PORT] Harbor hex C1 assigned port edge 445,386-445,428 with vertices 445,386, 445,428
+[DEBUG PORT SUCCESS] Harbor hex C1 (3:1): vertices ('445,386', '445,428')
+[DEBUG PORT] Harbor hex C9 assigned port edge 954,428-990,449 with vertices 954,428, 990,449
+[DEBUG PORT SUCCESS] Harbor hex C9 (Ore 2:1): vertices ('954,428', '990,449')
+[DEBUG PORT] Harbor hex E1 assigned port edge 445,512-445,554 with vertices 445,512, 445,554
+[DEBUG PORT SUCCESS] Harbor hex E1 (Brick 2:1): vertices ('445,512', '445,554')
+[DEBUG PORT] Harbor hex E9 assigned port edge 954,512-990,491 with vertices 954,512, 990,491
+[DEBUG PORT SUCCESS] Harbor hex E9 (3:1): vertices ('954,512', '990,491')
+[DEBUG PORT] Harbor hex G1 has no coastal edges, finding coastal vertices...
+[WARNING] Harbor hex G1 has no coastal vertices either
+[DEBUG PORT FAILED] Harbor hex G1 (3:1): NO VERTICES ASSIGNED
+[DEBUG PORT] Harbor hex G3 assigned port edge 627,617-663,638 with vertices 627,617, 663,638
+[DEBUG PORT SUCCESS] Harbor hex G3 (Wood 2:1): vertices ('627,617', '663,638')
+[DEBUG PORT] Harbor hex G5 assigned port edge 736,638-772,617 with vertices 736,638, 772,617
+[DEBUG PORT SUCCESS] Harbor hex G5 (3:1): vertices ('736,638', '772,617')
+[DEBUG PORT] Harbor hex G7 has no coastal edges, finding coastal vertices...
+[WARNING] Harbor hex G7 has no coastal vertices either
+[DEBUG PORT FAILED] Harbor hex G7 (Sheep 2:1): NO VERTICES ASSIGNED
+
+======================================================================
+BOARD: STANDARD
+======================================================================
+Row A: ~(W:1) ~     ~(3:1) ~     ~(S:1) ~     ~(3:1)
+Row B: ~     S12 W10 B 5 O 9 S 6 S 2 ~    
+Row C: ~(3:1) B 8 W 6 O 4 W 5 W10 W 8 W 8 ~(O:1)
+Row D: D     ~     O10 S 6 B 9 B 6 W 3 W11 S 8 ~    
+Row E: ~(B:1) S11 O 5 B 9 O 6 B 3 W 4 S 5 ~(3:1)
+Row F: ~     B 9 B 4 W 4 W 5 W 8 S10 ~    
+Row G: ~(3:1) ~     ~(W:1) ~     ~(3:1) ~     ~(S:1)
+
+Terrain hexes: 33
+Desert hexes: 1
+Water hexes: 24
+Harbor hexes: 12
+Total hexes: 58
+
+Rendering standard map with vertices, edges, and harbors...
+Hex-graph: 222 vertices, 272 edges
+(Press ESC to exit)
+
+[DEBUG] Board initialized with 222 vertices and 272 edges
+[DEBUG] Renderer hex_size: 42, Sidebar width: 200, Board starts at x=200
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (483, 327)
+[DEBUG] FOUND vertex 482,323 at pixel (482, 323), distance 4.1
+[DEBUG] Clicked on board, looking for vertex at (483, 327), found: 482,323
+[DEBUG ADJ] Checking vertex 482,323
+[DEBUG ADJ]   Direct neighbors (1 edge): {'518,302', '482,365'}
+[DEBUG ADJ]   Neighbors of neighbors (2 edges): {'518,260', '554,323', '518,386'}
+[DEBUG ADJ]   Settlements: {}
+[DEBUG ADJ]   Cities: {}
+[DEBUG ADJ ALLOWED] Vertex 482,323 passed adjacency check
+[DEBUG SETTLEMENT] Placed settlement at 482,323 for player 1
+[DEBUG] Placed settlement at 482,323 for player 1
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (481, 366)
+[DEBUG] FOUND vertex 481,365 at pixel (481, 365), distance 1.0
+[DEBUG] Clicked on board, looking for vertex at (481, 366), found: 481,365
+[DEBUG ADJ] Checking vertex 481,365
+[DEBUG ADJ]   Direct neighbors (1 edge): {'481,323', '517,386', '445,386'}
+[DEBUG ADJ]   Neighbors of neighbors (2 edges): {'445,302', '517,428', '445,428', '409,365', '517,302'}
+[DEBUG ADJ]   Settlements: {'482,323': 1}
+[DEBUG ADJ]   Cities: {}
+[DEBUG ADJ ALLOWED] Vertex 481,365 passed adjacency check
+[DEBUG SETTLEMENT] Placed settlement at 481,365 for player 1
+[DEBUG] Placed settlement at 481,365 for player 1
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (445, 384)
+[DEBUG] FOUND vertex 445,386 at pixel (445, 386), distance 2.0
+[DEBUG] Clicked on board, looking for vertex at (445, 384), found: 445,386
+[DEBUG ADJ] Checking vertex 445,386
+[DEBUG ADJ]   Direct neighbors (1 edge): {'481,365', '445,428', '409,365'}
+[DEBUG ADJ]   Neighbors of neighbors (2 edges): {'373,386', '517,386', '409,323', '481,449', '481,323', '409,449'}
+[DEBUG ADJ]   Settlements: {'482,323': 1, '481,365': 1}
+[DEBUG ADJ]   Cities: {}
+[DEBUG ADJ BLOCKED] Vertex 481,365 in blocked set has settlement/city - REJECTION
+[DEBUG SETTLEMENT] Cannot place settlement at 445,386 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 445,386
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (445, 384)
+[DEBUG] FOUND vertex 445,386 at pixel (445, 386), distance 2.0
+[DEBUG] Clicked on board, looking for vertex at (445, 384), found: 445,386
+[DEBUG ADJ] Checking vertex 445,386
+[DEBUG ADJ]   Direct neighbors (1 edge): {'481,365', '445,428', '409,365'}
+[DEBUG ADJ]   Neighbors of neighbors (2 edges): {'373,386', '517,386', '409,323', '481,449', '481,323', '409,449'}
+[DEBUG ADJ]   Settlements: {'482,323': 1, '481,365': 1}
+[DEBUG ADJ]   Cities: {}
+[DEBUG ADJ BLOCKED] Vertex 481,365 in blocked set has settlement/city - REJECTION
+[DEBUG SETTLEMENT] Cannot place settlement at 445,386 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 445,386
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (445, 384)
+[DEBUG] FOUND vertex 445,386 at pixel (445, 386), distance 2.0
+[DEBUG] Clicked on board, looking for vertex at (445, 384), found: 445,386
+[DEBUG ADJ] Checking vertex 445,386
+[DEBUG ADJ]   Direct neighbors (1 edge): {'481,365', '445,428', '409,365'}
+[DEBUG ADJ]   Neighbors of neighbors (2 edges): {'373,386', '517,386', '409,323', '481,449', '481,323', '409,449'}
+[DEBUG ADJ]   Settlements: {'482,323': 1, '481,365': 1}
+[DEBUG ADJ]   Cities: {}
+[DEBUG ADJ BLOCKED] Vertex 481,365 in blocked set has settlement/city - REJECTION
+[DEBUG SETTLEMENT] Cannot place settlement at 445,386 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 445,386
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (445, 383)
+[DEBUG] FOUND vertex 445,386 at pixel (445, 386), distance 3.0
+[DEBUG] Clicked on board, looking for vertex at (445, 383), found: 445,386
+[DEBUG ADJ] Checking vertex 445,386
+[DEBUG ADJ]   Direct neighbors (1 edge): {'481,365', '445,428', '409,365'}
+[DEBUG ADJ]   Neighbors of neighbors (2 edges): {'373,386', '517,386', '409,323', '481,449', '481,323', '409,449'}
+[DEBUG ADJ]   Settlements: {'482,323': 1, '481,365': 1}
+[DEBUG ADJ]   Cities: {}
+[DEBUG ADJ BLOCKED] Vertex 481,365 in blocked set has settlement/city - REJECTION
+[DEBUG SETTLEMENT] Cannot place settlement at 445,386 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 445,386
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (444, 385)
+[DEBUG] FOUND vertex 445,386 at pixel (445, 386), distance 1.4
+[DEBUG] Clicked on board, looking for vertex at (444, 385), found: 445,386
+[DEBUG ADJ] Checking vertex 445,386
+[DEBUG ADJ]   Direct neighbors (1 edge): {'481,365', '445,428', '409,365'}
+[DEBUG ADJ]   Neighbors of neighbors (2 edges): {'373,386', '517,386', '409,323', '481,449', '481,323', '409,449'}
+[DEBUG ADJ]   Settlements: {'482,323': 1, '481,365': 1}
+[DEBUG ADJ]   Cities: {}
+[DEBUG ADJ BLOCKED] Vertex 481,365 in blocked set has settlement/city - REJECTION
+[DEBUG SETTLEMENT] Cannot place settlement at 445,386 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 445,386
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (443, 427)
+[DEBUG] FOUND vertex 445,428 at pixel (445, 428), distance 2.2
+[DEBUG] Clicked on board, looking for vertex at (443, 427), found: 445,428
+[DEBUG ADJ] Checking vertex 445,428
+[DEBUG ADJ]   Direct neighbors (1 edge): {'409,449', '445,386', '481,449'}
+[DEBUG ADJ]   Neighbors of neighbors (2 edges): {'517,428', '481,365', '373,428', '409,365', '409,491', '481,491'}
+[DEBUG ADJ]   Settlements: {'482,323': 1, '481,365': 1}
+[DEBUG ADJ]   Cities: {}
+[DEBUG ADJ BLOCKED] Vertex 481,365 in blocked set has settlement/city - REJECTION
+[DEBUG SETTLEMENT] Cannot place settlement at 445,428 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 445,428
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (446, 426)
+[DEBUG] FOUND vertex 445,428 at pixel (445, 428), distance 2.2
+[DEBUG] Clicked on board, looking for vertex at (446, 426), found: 445,428
+[DEBUG ADJ] Checking vertex 445,428
+[DEBUG ADJ]   Direct neighbors (1 edge): {'409,449', '445,386', '481,449'}
+[DEBUG ADJ]   Neighbors of neighbors (2 edges): {'517,428', '481,365', '373,428', '409,365', '409,491', '481,491'}
+[DEBUG ADJ]   Settlements: {'482,323': 1, '481,365': 1}
+[DEBUG ADJ]   Cities: {}
+[DEBUG ADJ BLOCKED] Vertex 481,365 in blocked set has settlement/city - REJECTION
+[DEBUG SETTLEMENT] Cannot place settlement at 445,428 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 445,428
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (485, 450)
+[DEBUG] FOUND vertex 482,449 at pixel (482, 449), distance 3.2
+[DEBUG] Clicked on board, looking for vertex at (485, 450), found: 482,449
+[DEBUG ADJ] Checking vertex 482,449
+[DEBUG ADJ]   Direct neighbors (1 edge): {'482,491', '518,428'}
+[DEBUG ADJ]   Neighbors of neighbors (2 edges): {'554,449', '518,386', '518,512'}
+[DEBUG ADJ]   Settlements: {'482,323': 1, '481,365': 1}
+[DEBUG ADJ]   Cities: {}
+[DEBUG ADJ ALLOWED] Vertex 482,449 passed adjacency check
+[DEBUG SETTLEMENT] Placed settlement at 482,449 for player 1
+[DEBUG] Placed settlement at 482,449 for player 1
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (553, 367)
+[DEBUG] FOUND vertex 554,365 at pixel (554, 365), distance 2.2
+[DEBUG] Clicked on board, looking for vertex at (553, 367), found: 554,365
+[DEBUG ADJ] Checking vertex 554,365
+[DEBUG ADJ]   Direct neighbors (1 edge): {'554,323', '590,386', '518,386'}
+[DEBUG ADJ]   Neighbors of neighbors (2 edges): {'518,302', '626,365', '518,428', '590,302', '590,428', '482,365'}
+[DEBUG ADJ]   Settlements: {'482,323': 1, '481,365': 1, '482,449': 1}
+[DEBUG ADJ]   Cities: {}
+[DEBUG ADJ ALLOWED] Vertex 554,365 passed adjacency check
+[DEBUG SETTLEMENT] Placed settlement at 554,365 for player 1
+[DEBUG] Placed settlement at 554,365 for player 1
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (516, 388)
+[DEBUG] FOUND vertex 517,386 at pixel (517, 386), distance 2.2
+[DEBUG] Clicked on board, looking for vertex at (516, 388), found: 517,386
+[DEBUG ADJ] Checking vertex 517,386
+[DEBUG ADJ]   Direct neighbors (1 edge): {'481,365', '517,428'}
+[DEBUG ADJ]   Neighbors of neighbors (2 edges): {'481,323', '445,386', '481,449'}
+[DEBUG ADJ]   Settlements: {'482,323': 1, '481,365': 1, '482,449': 1, '554,365': 1}
+[DEBUG ADJ]   Cities: {}
+[DEBUG ADJ BLOCKED] Vertex 481,365 in blocked set has settlement/city - REJECTION
+[DEBUG SETTLEMENT] Cannot place settlement at 517,386 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 517,386
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (518, 429)
+[DEBUG] FOUND vertex 518,428 at pixel (518, 428), distance 1.0
+[DEBUG] Clicked on board, looking for vertex at (518, 429), found: 518,428
+[DEBUG ADJ] Checking vertex 518,428
+[DEBUG ADJ]   Direct neighbors (1 edge): {'482,449', '518,386', '554,449'}
+[DEBUG ADJ]   Neighbors of neighbors (2 edges): {'482,491', '554,365', '554,491', '590,428', '482,365'}
+[DEBUG ADJ]   Settlements: {'482,323': 1, '481,365': 1, '482,449': 1, '554,365': 1}
+[DEBUG ADJ]   Cities: {}
+[DEBUG ADJ BLOCKED] Vertex 482,449 in blocked set has settlement/city - REJECTION
+[DEBUG SETTLEMENT] Cannot place settlement at 518,428 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 518,428
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (553, 449)
+[DEBUG] FOUND vertex 554,449 at pixel (554, 449), distance 1.0
+[DEBUG] Clicked on board, looking for vertex at (553, 449), found: 554,449
+[DEBUG ADJ] Checking vertex 554,449
+[DEBUG ADJ]   Direct neighbors (1 edge): {'518,428', '554,491', '590,428'}
+[DEBUG ADJ]   Neighbors of neighbors (2 edges): {'590,512', '590,386', '482,449', '518,512', '626,449', '518,386'}
+[DEBUG ADJ]   Settlements: {'482,323': 1, '481,365': 1, '482,449': 1, '554,365': 1}
+[DEBUG ADJ]   Cities: {}
+[DEBUG ADJ BLOCKED] Vertex 482,449 in blocked set has settlement/city - REJECTION
+[DEBUG SETTLEMENT] Cannot place settlement at 554,449 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 554,449
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (553, 449)
+[DEBUG] FOUND vertex 554,449 at pixel (554, 449), distance 1.0
+[DEBUG] Clicked on board, looking for vertex at (553, 449), found: 554,449
+[DEBUG ADJ] Checking vertex 554,449
+[DEBUG ADJ]   Direct neighbors (1 edge): {'518,428', '554,491', '590,428'}
+[DEBUG ADJ]   Neighbors of neighbors (2 edges): {'590,512', '590,386', '482,449', '518,512', '626,449', '518,386'}
+[DEBUG ADJ]   Settlements: {'482,323': 1, '481,365': 1, '482,449': 1, '554,365': 1}
+[DEBUG ADJ]   Cities: {}
+[DEBUG ADJ BLOCKED] Vertex 482,449 in blocked set has settlement/city - REJECTION
+[DEBUG SETTLEMENT] Cannot place settlement at 554,449 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 554,449
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (553, 449)
+[DEBUG] FOUND vertex 554,449 at pixel (554, 449), distance 1.0
+[DEBUG] Clicked on board, looking for vertex at (553, 449), found: 554,449
+[DEBUG ADJ] Checking vertex 554,449
+[DEBUG ADJ]   Direct neighbors (1 edge): {'518,428', '554,491', '590,428'}
+[DEBUG ADJ]   Neighbors of neighbors (2 edges): {'590,512', '590,386', '482,449', '518,512', '626,449', '518,386'}
+[DEBUG ADJ]   Settlements: {'482,323': 1, '481,365': 1, '482,449': 1, '554,365': 1}
+[DEBUG ADJ]   Cities: {}
+[DEBUG ADJ BLOCKED] Vertex 482,449 in blocked set has settlement/city - REJECTION
+[DEBUG SETTLEMENT] Cannot place settlement at 554,449 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 554,449
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (553, 449)
+[DEBUG] FOUND vertex 554,449 at pixel (554, 449), distance 1.0
+[DEBUG] Clicked on board, looking for vertex at (553, 449), found: 554,449
+[DEBUG ADJ] Checking vertex 554,449
+[DEBUG ADJ]   Direct neighbors (1 edge): {'518,428', '554,491', '590,428'}
+[DEBUG ADJ]   Neighbors of neighbors (2 edges): {'590,512', '590,386', '482,449', '518,512', '626,449', '518,386'}
+[DEBUG ADJ]   Settlements: {'482,323': 1, '481,365': 1, '482,449': 1, '554,365': 1}
+[DEBUG ADJ]   Cities: {}
+[DEBUG ADJ BLOCKED] Vertex 482,449 in blocked set has settlement/city - REJECTION
+[DEBUG SETTLEMENT] Cannot place settlement at 554,449 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 554,449
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (553, 449)
+[DEBUG] FOUND vertex 554,449 at pixel (554, 449), distance 1.0
+[DEBUG] Clicked on board, looking for vertex at (553, 449), found: 554,449
+[DEBUG ADJ] Checking vertex 554,449
+[DEBUG ADJ]   Direct neighbors (1 edge): {'518,428', '554,491', '590,428'}
+[DEBUG ADJ]   Neighbors of neighbors (2 edges): {'590,512', '590,386', '482,449', '518,512', '626,449', '518,386'}
+[DEBUG ADJ]   Settlements: {'482,323': 1, '481,365': 1, '482,449': 1, '554,365': 1}
+[DEBUG ADJ]   Cities: {}
+[DEBUG ADJ BLOCKED] Vertex 482,449 in blocked set has settlement/city - REJECTION
+[DEBUG SETTLEMENT] Cannot place settlement at 554,449 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 554,449
+[DEBUG] Sample vertices (first 3):
+  481,239: pixel_x=481, pixel_y=239
+  517,260: pixel_x=517, pixel_y=260
+  517,302: pixel_x=517, pixel_y=302
+[DEBUG] Mouse click at: (553, 449)
+[DEBUG] FOUND vertex 554,449 at pixel (554, 449), distance 1.0
+[DEBUG] Clicked on board, looking for vertex at (553, 449), found: 554,449
+[DEBUG ADJ] Checking vertex 554,449
+[DEBUG ADJ]   Direct neighbors (1 edge): {'518,428', '554,491', '590,428'}
+[DEBUG ADJ]   Neighbors of neighbors (2 edges): {'590,512', '590,386', '482,449', '518,512', '626,449', '518,386'}
+[DEBUG ADJ]   Settlements: {'482,323': 1, '481,365': 1, '482,449': 1, '554,365': 1}
+[DEBUG ADJ]   Cities: {}
+[DEBUG ADJ BLOCKED] Vertex 482,449 in blocked set has settlement/city - REJECTION
+[DEBUG SETTLEMENT] Cannot place settlement at 554,449 - adjacent vertex has settlement/city
+[DEBUG] Settlement placement INVALID at 554,449

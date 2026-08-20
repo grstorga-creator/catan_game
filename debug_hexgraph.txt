@@ -1,0 +1,205 @@
+pygame 2.6.1 (SDL 2.28.4, Python 3.12.0)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+
+Loading STANDARD map (seed=42)...
+[DEBUG] Randomized terrain for 33 hexes
+[DEBUG] Distributed 33 tokens to 33 terrain hexes
+[DEBUG] Token distribution: {2: 1, 3: 2, 4: 4, 5: 5, 6: 5, 8: 5, 9: 4, 10: 4, 11: 2, 12: 1}
+[DEBUG] Perimeter water hexes (24): ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'B8', 'C9', 'D10', 'E9', 'F8', 'G7', 'G6', 'G5', 'G4', 'G3', 'G2', 'G1', 'F1', 'E1', 'D2', 'C1', 'B1']
+[DEBUG] Position 0 (A1): Wheat 2:1
+[DEBUG] Position 1 (A2): plain water
+[DEBUG] Position 2 (A3): 3:1
+[DEBUG] Position 3 (A4): plain water
+[DEBUG] Position 4 (A5): Sheep 2:1
+[DEBUG] Position 5 (A6): plain water
+[DEBUG] Position 6 (A7): 3:1
+[DEBUG] Position 7 (B8): plain water
+[DEBUG] Position 8 (C9): Ore 2:1
+[DEBUG] Position 9 (D10): plain water
+[DEBUG] Position 10 (E9): 3:1
+[DEBUG] Position 11 (F8): plain water
+[DEBUG] Position 12 (G7): Sheep 2:1
+[DEBUG] Position 13 (G6): plain water
+[DEBUG] Position 14 (G5): 3:1
+[DEBUG] Position 15 (G4): plain water
+[DEBUG] Position 16 (G3): Wood 2:1
+[DEBUG] Position 17 (G2): plain water
+[DEBUG] Position 18 (G1): 3:1
+[DEBUG] Position 19 (F1): plain water
+[DEBUG] Position 20 (E1): Brick 2:1
+[DEBUG] Position 21 (D2): plain water
+[DEBUG] Position 22 (C1): 3:1
+[DEBUG] Position 23 (B1): plain water
+[DEBUG] Assigned 6 specific 2:1 harbors (of 6 available)
+[DEBUG] Assigned 6 generic 3:1 harbors (of 6 available)
+[DEBUG] Loaded card image for wood: wood_card_40x55.jpg
+[DEBUG] Loaded card image for brick: brick_card_40x55.jpg
+[DEBUG] Loaded card image for sheep: sheep_card_40x55.jpg
+[DEBUG] Loaded card image for ore: ore_card_40x55.jpg
+[DEBUG] Loaded card image for wheat: wheat_card_40x55.jpg
+Building hex-graph using renderer coordinates...
+[DEBUG HG] Building hex-graph with geometric vertex positions (hex_size=42)...
+[DEBUG HG] Created 222 total vertices (222 new)
+[DEBUG HG] Starting vertex deduplication (tolerance: 2 pixels)...
+[DEBUG MERGE] Deduplicating vertices with tolerance=2px...
+[DEBUG MERGE] Merged 518,260 into 517,260
+[DEBUG MERGE] Merged 518,302 into 517,302
+[DEBUG MERGE] Merged 482,323 into 481,323
+[DEBUG MERGE] Merged 591,260 into 590,260
+[DEBUG MERGE] Merged 591,302 into 590,302
+[DEBUG MERGE] Merged 664,260 into 663,260
+[DEBUG MERGE] Merged 664,302 into 663,302
+[DEBUG MERGE] Merged 626,323 into 627,323
+[DEBUG MERGE] Merged 699,323 into 700,323
+[DEBUG MERGE] Merged 809,260 into 808,260
+[DEBUG MERGE] Merged 809,302 into 808,302
+[DEBUG MERGE] Merged 773,323 into 772,323
+[DEBUG MERGE] Merged 882,260 into 881,260
+[DEBUG MERGE] Merged 882,302 into 881,302
+[DEBUG MERGE] Merged 917,323 into 918,323
+[DEBUG MERGE] Merged 482,365 into 481,365
+[DEBUG MERGE] Merged 517,386 into 518,386
+[DEBUG MERGE] Merged 627,365 into 626,365
+[DEBUG MERGE] Merged 591,386 into 590,386
+[DEBUG MERGE] Merged 700,365 into 699,365
+[DEBUG MERGE] Merged 664,386 into 663,386
+[DEBUG MERGE] Merged 773,365 into 772,365
+[DEBUG MERGE] Merged 808,386 into 809,386
+[DEBUG MERGE] Merged 918,365 into 917,365
+[DEBUG MERGE] Merged 882,386 into 881,386
+[DEBUG MERGE] Merged 408,449 into 409,449
+[DEBUG MERGE] Merged 372,428 into 373,428
+[DEBUG MERGE] Merged 518,428 into 517,428
+[DEBUG MERGE] Merged 482,449 into 481,449
+[DEBUG MERGE] Merged 591,428 into 590,428
+[DEBUG MERGE] Merged 664,428 into 663,428
+[DEBUG MERGE] Merged 626,449 into 627,449
+[DEBUG MERGE] Merged 699,449 into 700,449
+[DEBUG MERGE] Merged 809,428 into 808,428
+[DEBUG MERGE] Merged 773,449 into 772,449
+[DEBUG MERGE] Merged 882,428 into 881,428
+[DEBUG MERGE] Merged 917,449 into 918,449
+[DEBUG MERGE] Merged 1027,428 into 1026,428
+[DEBUG MERGE] Merged 991,449 into 990,449
+[DEBUG MERGE] Merged 409,491 into 408,491
+[DEBUG MERGE] Merged 373,512 into 372,512
+[DEBUG MERGE] Merged 482,491 into 481,491
+[DEBUG MERGE] Merged 517,512 into 518,512
+[DEBUG MERGE] Merged 627,491 into 626,491
+[DEBUG MERGE] Merged 591,512 into 590,512
+[DEBUG MERGE] Merged 700,491 into 699,491
+[DEBUG MERGE] Merged 664,512 into 663,512
+[DEBUG MERGE] Merged 773,491 into 772,491
+[DEBUG MERGE] Merged 808,512 into 809,512
+[DEBUG MERGE] Merged 918,491 into 917,491
+[DEBUG MERGE] Merged 882,512 into 881,512
+[DEBUG MERGE] Merged 991,491 into 990,491
+[DEBUG MERGE] Merged 1026,512 into 1027,512
+[DEBUG MERGE] Merged 518,554 into 517,554
+[DEBUG MERGE] Merged 482,575 into 481,575
+[DEBUG MERGE] Merged 591,554 into 590,554
+[DEBUG MERGE] Merged 664,554 into 663,554
+[DEBUG MERGE] Merged 626,575 into 627,575
+[DEBUG MERGE] Merged 699,575 into 700,575
+[DEBUG MERGE] Merged 809,554 into 808,554
+[DEBUG MERGE] Merged 773,575 into 772,575
+[DEBUG MERGE] Merged 882,554 into 881,554
+[DEBUG MERGE] Merged 917,575 into 918,575
+[DEBUG MERGE] Merged 482,617 into 481,617
+[DEBUG MERGE] Merged 517,638 into 518,638
+[DEBUG MERGE] Merged 627,617 into 626,617
+[DEBUG MERGE] Merged 591,638 into 590,638
+[DEBUG MERGE] Merged 700,617 into 699,617
+[DEBUG MERGE] Merged 664,638 into 663,638
+[DEBUG MERGE] Merged 773,617 into 772,617
+[DEBUG MERGE] Merged 808,638 into 809,638
+[DEBUG MERGE] Merged 918,617 into 917,617
+[DEBUG MERGE] Merged 882,638 into 881,638
+[DEBUG MERGE] Merged 518,680 into 517,680
+[DEBUG MERGE] Merged 591,680 into 590,680
+[DEBUG MERGE] Merged 664,680 into 663,680
+[DEBUG MERGE] Merged 809,680 into 808,680
+[DEBUG MERGE] Merged 882,680 into 881,680
+[DEBUG MERGE] Deduplication complete: merged 78 vertices
+[DEBUG MERGE] Final vertex count: 144
+[DEBUG HG EDGE] B2: created edge 554,323-554,365
+[DEBUG HG EDGE] B2: created edge 518,386-554,365
+[DEBUG HG EDGE] B2: created edge 481,365-518,386
+[DEBUG HG EDGE] C2: created edge 517,428-518,386
+[DEBUG HG EDGE] C2: created edge 481,449-517,428
+[DEBUG HG EDGE] C2: created edge 445,428-481,449
+[DEBUG HG] Created 201 total edges (201 new)
+[DEBUG HG] FINAL AFTER DEDUP: 144 vertices and 201 edges
+
+[DEBUG HG VALIDATION] Checking vertex connectivity...
+[DEBUG HG VALIDATION] Checking edge/vertex consistency...
+[OK] All 201 edges point to valid vertices
+[DEBUG HG VAL] Vertex 481,239: connected to 2 vertices: {'445,260', '517,260'}
+[DEBUG HG VAL]   Touches hexes: {'A1'}
+[DEBUG HG VAL] Vertex 517,260: connected to 3 vertices: {'517,302', '481,239', '554,239'}
+[DEBUG HG VAL]   Touches hexes: {'A1', 'A2'}
+[DEBUG HG VAL] Vertex 517,302: connected to 3 vertices: {'481,323', '554,323', '517,260'}
+[DEBUG HG VAL]   Touches hexes: {'B2', 'A1', 'A2'}
+[DEBUG HG VAL] Vertex 481,323: connected to 3 vertices: {'517,302', '481,365', '445,302'}
+[DEBUG HG VAL]   Touches hexes: {'B2', 'A1', 'B1'}
+[DEBUG HG VAL] Vertex 445,302: connected to 3 vertices: {'409,323', '445,260', '481,323'}
+[DEBUG HG VAL]   Touches hexes: {'A1', 'B1'}
+[DEBUG HG VAL] Vertex 445,260: connected to 2 vertices: {'481,239', '445,302'}
+[DEBUG HG VAL]   Touches hexes: {'A1'}
+[DEBUG HG VAL] Vertex 554,239: connected to 2 vertices: {'590,260', '517,260'}
+[DEBUG HG VAL]   Touches hexes: {'A2'}
+[DEBUG HG VAL] Vertex 590,260: connected to 3 vertices: {'590,302', '627,239', '554,239'}
+[DEBUG HG VAL]   Touches hexes: {'A3', 'A2'}
+[DEBUG HG VAL] Vertex 590,302: connected to 3 vertices: {'590,260', '627,323', '554,323'}
+[DEBUG HG VAL]   Touches hexes: {'B3', 'A3', 'A2'}
+[DEBUG HG VAL] Vertex 554,323: connected to 3 vertices: {'590,302', '554,365', '517,302'}
+[DEBUG HG VAL]   Touches hexes: {'B2', 'A2', 'B3'}
+[DEBUG PORT INIT] Starting port assignment for 12 harbor hexes
+[DEBUG PORT] Harbor hex A1 assigned port edge 481,323-517,302 with vertices 481,323, 517,302
+[DEBUG PORT SUCCESS] Harbor hex A1 (Wheat 2:1): vertices ('481,323', '517,302')
+[DEBUG PORT] Harbor hex A3 assigned port edge 590,302-627,323 with vertices 590,302, 627,323
+[DEBUG PORT SUCCESS] Harbor hex A3 (3:1): vertices ('590,302', '627,323')
+[DEBUG PORT] Harbor hex A5 assigned port edge 772,323-808,302 with vertices 772,323, 808,302
+[DEBUG PORT SUCCESS] Harbor hex A5 (Sheep 2:1): vertices ('772,323', '808,302')
+[DEBUG PORT] Harbor hex A7 assigned port edge 881,302-918,323 with vertices 881,302, 918,323
+[DEBUG PORT SUCCESS] Harbor hex A7 (3:1): vertices ('881,302', '918,323')
+[DEBUG PORT] Harbor hex C1 assigned port edge 445,386-445,428 with vertices 445,386, 445,428
+[DEBUG PORT SUCCESS] Harbor hex C1 (3:1): vertices ('445,386', '445,428')
+[DEBUG PORT] Harbor hex C9 assigned port edge 954,386-954,428 with vertices 954,386, 954,428
+[DEBUG PORT SUCCESS] Harbor hex C9 (Ore 2:1): vertices ('954,386', '954,428')
+[DEBUG PORT] Harbor hex E1 assigned port edge 445,512-445,554 with vertices 445,512, 445,554
+[DEBUG PORT SUCCESS] Harbor hex E1 (Brick 2:1): vertices ('445,512', '445,554')
+[DEBUG PORT] Harbor hex E9 assigned port edge 954,512-990,491 with vertices 954,512, 990,491
+[DEBUG PORT SUCCESS] Harbor hex E9 (3:1): vertices ('954,512', '990,491')
+[DEBUG PORT] Harbor hex G1 assigned port edge 481,617-518,638 with vertices 481,617, 518,638
+[DEBUG PORT SUCCESS] Harbor hex G1 (3:1): vertices ('481,617', '518,638')
+[DEBUG PORT] Harbor hex G3 assigned port edge 626,617-663,638 with vertices 626,617, 663,638
+[DEBUG PORT SUCCESS] Harbor hex G3 (Wood 2:1): vertices ('626,617', '663,638')
+[DEBUG PORT] Harbor hex G5 assigned port edge 736,638-772,617 with vertices 736,638, 772,617
+[DEBUG PORT SUCCESS] Harbor hex G5 (3:1): vertices ('736,638', '772,617')
+[DEBUG PORT] Harbor hex G7 assigned port edge 881,638-917,617 with vertices 881,638, 917,617
+[DEBUG PORT SUCCESS] Harbor hex G7 (Sheep 2:1): vertices ('881,638', '917,617')
+
+======================================================================
+BOARD: STANDARD
+======================================================================
+Row A: ~(W:1) ~     ~(3:1) ~     ~(S:1) ~     ~(3:1)
+Row B: ~     S12 W10 B 5 O 9 S 6 S 2 ~    
+Row C: ~(3:1) B 8 W 6 O 4 W 5 W10 W 8 W 8 ~(O:1)
+Row D: D     ~     O10 S 6 B 9 B 6 W 3 W11 S 8 ~    
+Row E: ~(B:1) S11 O 5 B 9 O 6 B 3 W 4 S 5 ~(3:1)
+Row F: ~     B 9 B 4 W 4 W 5 W 8 S10 ~    
+Row G: ~(3:1) ~     ~(W:1) ~     ~(3:1) ~     ~(S:1)
+
+Terrain hexes: 33
+Desert hexes: 1
+Water hexes: 24
+Harbor hexes: 12
+Total hexes: 58
+
+Rendering standard map with vertices, edges, and harbors...
+Hex-graph: 144 vertices, 201 edges
+(Press ESC to exit)
+
+[DEBUG] Board initialized with 144 vertices and 201 edges
+[DEBUG] Renderer hex_size: 42, Sidebar width: 200, Board starts at x=200
