@@ -2,6 +2,9 @@
 Project: NodKnaKra Settlers of Catan
 File: nodknaKra_renderer_oop.py
 EDIT HISTORY (most recent first):
+2026-08-18 - Claude - FINAL FIX: Adjacency check now uses actual edge.vertex1/vertex2 objects instead of parsing edge_id strings; ensures correctness after vertex deduplication
+2026-08-18 - Claude - FIX: Settlement adjacency corrected to block only distance 0-1, allow distance 2+ (proper Catan rule: one empty vertex between settlements)
+2026-08-18 - Claude - FIX: Adjacency check refactored to use edge objects for graph traversal (scalable to any map size/hex_size)
 2026-08-18 - Claude - CRITICAL FIX: Pass hex_size to hex-graph building; added vertex click debug output for coordinate matching
 2026-08-18 - Claude - Increased hex_size from 30 to 42 (+40%); added token_font (24pt) for hex labels; vertices/edges auto-scale
 2026-08-18 - Claude - Increased window to 1400x900; enlarged all fonts (+40%); spelled out full piece names
