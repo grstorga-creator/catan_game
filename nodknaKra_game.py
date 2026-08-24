@@ -2,6 +2,7 @@
 Project: NodKnaKra Settlers of Catan
 File: nodknaKra_game.py
 EDIT HISTORY (most recent first):
+2026-08-18 - Claude - FEATURE: Added extra 3:1 and 2:1 harbors for Large map; random commodity selection for Large map's extra 2:1
 2026-08-18 - Claude - FINAL FIX: Added vertex deduplication pass to merge vertices within 2px (fixes floating-point rounding from trig); ensures perfect adjacency
 2026-08-18 - Claude - CRITICAL MATH FIX: Replace hardcoded 0.866 approximation with trigonometric vertex calculation using cos/sin for perfect rounding
 2026-08-18 - Claude - FIX: Port assignment now handles corner hexes with no coastal edges (fallback to coastal vertices)
@@ -51,6 +52,7 @@ HARBOR_SPECIFICS = [
     HarborType.SHEEP_2_1,  # Two sheep ports
     HarborType.WHEAT_2_1,
     HarborType.ORE_2_1,
+    HarborType.WOOD_2_1,  # Extra 2:1 for Large map (random commodity - Wood)
 ]
 
 HARBOR_GENERIC = [
@@ -60,6 +62,7 @@ HARBOR_GENERIC = [
     HarborType.GENERIC_3_1,
     HarborType.GENERIC_3_1,
     HarborType.GENERIC_3_1,
+    HarborType.GENERIC_3_1,  # Extra 3:1 for Large map
 ]
 
 
@@ -615,6 +618,18 @@ class Board:
         # Shuffle specific 2:1 harbors
         specific_harbors = HARBOR_SPECIFICS.copy()
         random.shuffle(specific_harbors)
+        
+        # For Large map, replace the last (random) 2:1 harbor with a random commodity choice
+        if len(specific_harbors) > 6:
+            random_commodity = random.choice([
+                HarborType.WOOD_2_1,
+                HarborType.BRICK_2_1,
+                HarborType.SHEEP_2_1,
+                HarborType.WHEAT_2_1,
+                HarborType.ORE_2_1,
+            ])
+            specific_harbors[-1] = random_commodity
+            print(f"[DEBUG HARBOR] Large map extra 2:1 harbor: {random_commodity.value}")
         
         # Shuffle generic 3:1 harbors
         generic_harbors = HARBOR_GENERIC.copy()

@@ -2,6 +2,9 @@
 Project: NodKnaKra Settlers of Catan
 File: nodknaKra_renderer_oop.py
 EDIT HISTORY (most recent first):
+2026-08-18 - Claude - FEATURE: Added longest road calculation (contiguous roads per player, blocked by opponent settlements/cities) with sidebar display
+2026-08-18 - Claude - FIX: Road placement now allows roads from any valid endpoint (skip blocked opponent endpoints, check if valid endpoint connects)
+2026-08-18 - Claude - FIX: Road placement now blocks roads that pass through opponent settlements/cities (both endpoints checked)
 2026-08-18 - Claude - FINAL FIX: Adjacency check now uses actual edge.vertex1/vertex2 objects instead of parsing edge_id strings; ensures correctness after vertex deduplication
 2026-08-18 - Claude - FIX: Settlement adjacency corrected to block only distance 0-1, allow distance 2+ (proper Catan rule: one empty vertex between settlements)
 2026-08-18 - Claude - FIX: Adjacency check refactored to use edge objects for graph traversal (scalable to any map size/hex_size)
@@ -207,7 +210,157 @@ class PlacementPalette:
         return False
         return False
     
-    def _get_vertex_distance(self, v1_id: str, v2_id: str) -> int:
+    def calculate_longest_road(self, player: int, board: 'Game') -> int:
+        """
+        Calculate the longest contiguous road for a player.
+        A contiguous road is a single unbranched path - no branches allowed.
+        A chain ends when hitting an opponent's settlement/city or when the road branches.
+        
+        Args:
+            player: Player number (1-4)
+            board: Game board
+        
+        Returns:
+            Length of the longest unbranched road (number of connected road segments)
+        """
+        if not self.roads:
+            print(f"[ROAD DEBUG] No roads at all")
+            return 0
+        
+        # Get all roads owned by this player
+        player_roads = {edge_id: edge for edge_id, edge in board.edges.items() 
+                       if edge_id in self.roads and self.roads[edge_id] == player}
+        
+        if not player_roads:
+            print(f"[ROAD DEBUG P{player}] No roads for this player. Total roads: {len(self.roads)}")
+            for edge_id, owner in self.roads.items():
+                print(f"[ROAD DEBUG] Edge {edge_id} owned by P{owner}")
+            return 0
+        
+        print(f"[ROAD DEBUG P{player}] Found {len(player_roads)} roads for this player")
+        for edge_id in player_roads.keys():
+            print(f"[ROAD DEBUG P{player}] Road: {edge_id}")
+        
+        longest_length = 0
+        longest_start = None
+        
+        # For each road, try it as a starting point and find longest unbranched path from it
+        for start_edge_id in player_roads.keys():
+            # Try extending in both directions from this road
+            length = self._longest_unbranched_path(start_edge_id, player, board, set(), None)
+            print(f"[ROAD DEBUG P{player}] Starting from {start_edge_id}: length = {length}")
+            if length > longest_length:
+                longest_length = length
+                longest_start = start_edge_id
+        
+        print(f"[ROAD DEBUG P{player}] LONGEST ROAD: {longest_length} roads (starting from {longest_start})")
+        return longest_length
+    
+    def _longest_unbranched_path(self, edge_id: str, player: int, board: 'Game', 
+                                 visited_edges: set, prev_vertex_id: str = None) -> int:
+        """
+        Find the longest unbranched path from a starting edge.
+        At each vertex, there can be at most 2 roads (one incoming, one outgoing).
+        If there are more, the path branches and we stop.
+        
+        Args:
+            edge_id: Current edge being traversed
+            player: Player number
+            board: Game board
+            visited_edges: Set of edges already in this path
+            prev_vertex_id: The vertex we came FROM (to avoid going backwards)
+        """
+        if edge_id in visited_edges:
+            print(f"[ROAD PATH] Edge {edge_id} already visited")
+            return 0
+        
+        visited_edges.add(edge_id)
+        print(f"[ROAD PATH] Traversing edge {edge_id} (visited: {len(visited_edges)})")
+        
+        if edge_id not in board.edges:
+            print(f"[ROAD PATH] Edge {edge_id} not in board.edges!")
+            return 0
+        
+        edge = board.edges[edge_id]
+        if not edge.vertex1 or not edge.vertex2:
+            print(f"[ROAD PATH] Edge {edge_id} has missing vertices")
+            return 0
+        
+        current_length = 1  # Count this road
+        
+        # Determine which end of the edge to extend from
+        # If prev_vertex_id is None, we can go from either end
+        # Otherwise, we came from prev_vertex_id, so go to the OTHER vertex
+        
+        if prev_vertex_id is None:
+            print(f"[ROAD PATH] Starting point {edge_id}: trying both ends")
+            # Starting point - try extending from both ends, pick longest
+            max_length = 0
+            for next_vertex in [edge.vertex1, edge.vertex2]:
+                next_vertex_id = next_vertex.vertex_id
+                print(f"[ROAD PATH]   Trying end {next_vertex_id}")
+                length = self._extend_from_vertex(next_vertex_id, player, board, visited_edges.copy(), edge_id)
+                if length > max_length:
+                    max_length = length
+            print(f"[ROAD PATH] Edge {edge_id}: max extension = {max_length}, total = {current_length + max_length}")
+            return current_length + max_length
+        else:
+            # We're in the middle of a path - continue to the OTHER end
+            if edge.vertex1.vertex_id == prev_vertex_id:
+                next_vertex_id = edge.vertex2.vertex_id
+            else:
+                next_vertex_id = edge.vertex1.vertex_id
+            
+            print(f"[ROAD PATH] Continuing from {prev_vertex_id} through {edge_id} to {next_vertex_id}")
+            extension = self._extend_from_vertex(next_vertex_id, player, board, visited_edges, edge_id)
+            print(f"[ROAD PATH] Edge {edge_id}: extension = {extension}, total = {current_length + extension}")
+            return current_length + extension
+    
+    def _extend_from_vertex(self, vertex_id: str, player: int, board: 'Game',
+                           visited_edges: set, coming_from_edge_id: str) -> int:
+        """
+        Try to extend the path from a vertex.
+        The path can only continue if there's exactly ONE unvisited connected road.
+        If there are 0 or 2+ unvisited roads, the path ends (either terminus or branch).
+        """
+        # Check if this vertex is blocked by opponent settlement/city
+        if vertex_id in self.settlements and self.settlements[vertex_id] != player:
+            print(f"[ROAD EXT] Vertex {vertex_id}: blocked by opponent settlement")
+            return 0  # Path ends at opponent's settlement
+        if vertex_id in self.cities and self.cities[vertex_id] != player:
+            print(f"[ROAD EXT] Vertex {vertex_id}: blocked by opponent city")
+            return 0  # Path ends at opponent's city
+        
+        # Find unvisited connected roads from this vertex
+        connected_roads = []
+        for edge_id, edge in board.edges.items():
+            if edge_id in visited_edges:
+                continue  # Already part of path
+            if edge_id not in self.roads or self.roads[edge_id] != player:
+                continue  # Not a player's road
+            
+            # Check if this edge connects to our vertex
+            if edge.vertex1 and edge.vertex1.vertex_id == vertex_id:
+                connected_roads.append(edge_id)
+            elif edge.vertex2 and edge.vertex2.vertex_id == vertex_id:
+                connected_roads.append(edge_id)
+        
+        print(f"[ROAD EXT] Vertex {vertex_id}: found {len(connected_roads)} unvisited connected roads: {connected_roads}")
+        
+        # Path can only continue if there's EXACTLY ONE unvisited connected road
+        if len(connected_roads) == 0:
+            print(f"[ROAD EXT] Vertex {vertex_id}: dead end (0 roads)")
+            return 0  # Dead end
+        elif len(connected_roads) == 1:
+            # Continue on the only connected road
+            next_edge_id = connected_roads[0]
+            print(f"[ROAD EXT] Vertex {vertex_id}: continuing to {next_edge_id}")
+            # Don't add to visited here - let _longest_unbranched_path do it
+            return self._longest_unbranched_path(next_edge_id, player, board, visited_edges, vertex_id)
+        else:
+            # len(connected_roads) >= 2 - this is a branch point!
+            print(f"[ROAD EXT] Vertex {vertex_id}: BRANCH POINT ({len(connected_roads)} roads) - stopping")
+            return 0  # Path branches here, can't continue
         """Calculate minimum edge distance between two vertices"""
         if v1_id == v2_id:
             return 0
@@ -247,8 +400,8 @@ class PlacementPalette:
         Valid if:
         - Edge is empty AND
         - Edge touches at least one land hex (not water) AND
-        - Road connects to a settlement/city of same player, OR
-        - Road connects to another road of same player
+        - At least ONE endpoint is NOT blocked by opponent piece AND
+        - That valid endpoint connects to player's settlement/city/road
         """
         if edge_id in self.roads:
             print(f"[DEBUG ROAD] Edge {edge_id} already has a road")
@@ -269,33 +422,51 @@ class PlacementPalette:
             vertex_id_1 = vertices_str[0]  # "x1,y1"
             vertex_id_2 = vertices_str[1]  # "x2,y2"
             print(f"[DEBUG ROAD] Edge {edge_id} has vertices: {vertex_id_1}, {vertex_id_2}")
-            print(f"[DEBUG ROAD] Settlements: {self.settlements}")
-            print(f"[DEBUG ROAD] Cities: {self.cities}")
         except Exception as e:
             print(f"[DEBUG ROAD] Error parsing edge {edge_id}: {e}")
             return False
         
-        # Check both endpoints of the edge
+        # Check which endpoints are BLOCKED by opponent pieces
+        blocked_endpoints = set()
         for vertex_id in [vertex_id_1, vertex_id_2]:
-            print(f"[DEBUG ROAD] Checking vertex {vertex_id} for player {player}")
-            # Check if vertex has a settlement or city of same player
             if vertex_id in self.settlements:
-                print(f"[DEBUG ROAD] Found settlement at {vertex_id} owned by player {self.settlements[vertex_id]}")
-                if self.settlements[vertex_id] == player:
-                    print(f"[DEBUG ROAD] Settlement matches player {player} - VALID!")
-                    return True
+                settlement_owner = self.settlements[vertex_id]
+                if settlement_owner != player:
+                    print(f"[DEBUG ROAD] Vertex {vertex_id} has opponent settlement (player {settlement_owner}) - BLOCKED")
+                    blocked_endpoints.add(vertex_id)
+            
             if vertex_id in self.cities:
-                print(f"[DEBUG ROAD] Found city at {vertex_id} owned by player {self.cities[vertex_id]}")
-                if self.cities[vertex_id] == player:
-                    print(f"[DEBUG ROAD] City matches player {player} - VALID!")
-                    return True
+                city_owner = self.cities[vertex_id]
+                if city_owner != player:
+                    print(f"[DEBUG ROAD] Vertex {vertex_id} has opponent city (player {city_owner}) - BLOCKED")
+                    blocked_endpoints.add(vertex_id)
+        
+        # Check valid (non-blocked) endpoints for connections
+        print(f"[DEBUG ROAD] Settlements: {self.settlements}, Cities: {self.cities}")
+        print(f"[DEBUG ROAD] Player {player} checking endpoints. Blocked: {blocked_endpoints}")
+        
+        for vertex_id in [vertex_id_1, vertex_id_2]:
+            if vertex_id in blocked_endpoints:
+                print(f"[DEBUG ROAD] Skipping blocked endpoint {vertex_id}")
+                continue  # Skip blocked endpoints
+            
+            print(f"[DEBUG ROAD] Checking valid endpoint {vertex_id} for player {player}")
+            
+            # Check if vertex has a settlement or city of same player
+            if vertex_id in self.settlements and self.settlements[vertex_id] == player:
+                print(f"[DEBUG ROAD] Found own settlement at {vertex_id} - VALID!")
+                return True
+            
+            if vertex_id in self.cities and self.cities[vertex_id] == player:
+                print(f"[DEBUG ROAD] Found own city at {vertex_id} - VALID!")
+                return True
             
             # Check if vertex connects to a road of same player
             if self._is_connected_to_road(vertex_id, player, board, edge_id):
-                print(f"[DEBUG ROAD] Vertex {vertex_id} connects to road for player {player} - VALID!")
+                print(f"[DEBUG ROAD] Vertex {vertex_id} connects to own road - VALID!")
                 return True
         
-        print(f"[DEBUG ROAD] No valid connection found for edge {edge_id}")
+        print(f"[DEBUG ROAD] No valid endpoints found for edge {edge_id}")
         return False
     
     def _edge_touches_land(self, edge_id: str, board: 'Game') -> bool:
@@ -764,6 +935,19 @@ class HexRenderer:
             counts = palette.get_piece_count(player)
             count_text = f"P{player}: {counts['settlements']}S {counts['cities']}C {counts['roads']}R"
             text = self.small_font.render(count_text, True, (80, 80, 80))
+            self.screen.blit(text, (8, y_pos))
+            y_pos += 14
+        
+        # Longest road display
+        y_pos += 5  # Add spacing
+        label = self.small_font.render("Longest road:", True, (80, 80, 80))
+        self.screen.blit(label, (8, y_pos))
+        y_pos += 15
+        
+        for player in range(1, 5):
+            longest = palette.calculate_longest_road(player, self.board)
+            road_text = f"P{player}: {longest} roads"
+            text = self.small_font.render(road_text, True, (80, 80, 80))
             self.screen.blit(text, (8, y_pos))
             y_pos += 14
     
