@@ -2,6 +2,7 @@
 Project: NodKnaKra Settlers of Catan
 File: nodknaKra_game.py
 EDIT HISTORY (most recent first):
+2026-08-18 - Claude - FEATURE: Complete VP system implemented (Player class, VP calculation, award logic, win condition)
 2026-08-18 - Claude - FEATURE: Added extra 3:1 and 2:1 harbors for Large map; random commodity selection for Large map's extra 2:1
 2026-08-18 - Claude - FINAL FIX: Added vertex deduplication pass to merge vertices within 2px (fixes floating-point rounding from trig); ensures perfect adjacency
 2026-08-18 - Claude - CRITICAL MATH FIX: Replace hardcoded 0.866 approximation with trigonometric vertex calculation using cos/sin for perfect rounding
@@ -778,6 +779,86 @@ class Board:
         print(f"Total hexes: {len(self.hexes)}\n")
 
 
+class Player:
+    """Represents a single player with their pieces and victory points"""
+    
+    # Victory point card types
+    VP_CARD_TYPES = ['university', 'brothel', 'market', 'library', 'great_hall', 'chapel']
+    VP_CARD_VALUES = {
+        'university': 1,
+        'brothel': 2,
+        'market': 1,
+        'library': 1,
+        'great_hall': 1,
+        'chapel': 1,
+    }
+    
+    def __init__(self, player_number: int):
+        """Initialize a player"""
+        self.player_number = player_number
+        
+        # Board pieces
+        self.settlements = {}  # vertex_id -> None (just tracking ownership)
+        self.cities = {}       # vertex_id -> None
+        self.roads = {}        # edge_id -> None
+        
+        # Soldiers and awards
+        self.soldiers = 0
+        self.sheriff_played = False  # Sheriff card played (counts as 2 soldiers)
+        
+        # Victory point cards (face-up and face-down)
+        self.vp_cards_face_up = {card_type: 0 for card_type in self.VP_CARD_TYPES}
+        self.vp_cards_face_down = {card_type: 0 for card_type in self.VP_CARD_TYPES}
+        
+        # Decoy cards (face-up and face-down)
+        self.decoys_face_up = 0
+        self.decoys_face_down = 0
+        
+        # Awards (held by this player)
+        self.holds_longest_road = False
+        self.holds_largest_army = False
+        
+        # Victory points breakdown
+        self.base_vp = 0  # settlements + cities
+        self.award_vp = 0  # longest road + largest army (2 each)
+        self.card_vp = 0  # played VP cards + decoys
+        self.total_vp = 0
+    
+    def get_total_soldiers(self) -> int:
+        """Get total soldiers (including sheriff if played)"""
+        total = self.soldiers
+        if self.sheriff_played:
+            total += 2  # Sheriff counts as 2 soldiers
+        return total
+    
+    def get_decoy_vp(self) -> int:
+        """Get VP from decoys (3 decoys = 1 VP)"""
+        return self.decoys_face_up // 3
+    
+    def calculate_vp(self):
+        """Calculate all VP sources for this player"""
+        # Base VP: settlements (1) + cities (2)
+        self.base_vp = len(self.settlements) + (len(self.cities) * 2)
+        
+        # Award VP: longest road (2) + largest army (2)
+        self.award_vp = 0
+        if self.holds_longest_road:
+            self.award_vp += 2
+        if self.holds_largest_army:
+            self.award_vp += 2
+        
+        # Card VP: face-up VP cards + face-up decoys
+        self.card_vp = 0
+        for card_type, count in self.vp_cards_face_up.items():
+            self.card_vp += count * self.VP_CARD_VALUES[card_type]
+        self.card_vp += self.get_decoy_vp()
+        
+        # Total VP
+        self.total_vp = self.base_vp + self.award_vp + self.card_vp
+        
+        return self.total_vp
+
+
 class Game:
     """Main game class"""
     
@@ -787,20 +868,183 @@ class Game:
         'large': LARGE,
     }
     
-    def __init__(self, map_name: str = 'standard', seed: int = None):
-        """Initialize game with a map"""
+    def __init__(self, map_name: str = 'standard', seed: int = None, win_condition_vp: int = 10):
+        """
+        Initialize game with a map
+        
+        Args:
+            map_name: 'small', 'standard', or 'large'
+            seed: Random seed for reproducibility
+            win_condition_vp: VP required to win (default 10, can be customized)
+        """
         if map_name not in self.MAPS:
             raise ValueError(f"Unknown map: {map_name}. Choose from {list(self.MAPS.keys())}")
         
         self.map_name = map_name
         self.map_config = self.MAPS[map_name]
         self.board = Board(self.map_config, seed=seed)
+        
+        # Victory point system
+        self.win_condition_vp = win_condition_vp
+        
+        # Create 4 players
+        self.players = {i: Player(i) for i in range(1, 5)}  # Players 1-4
+        
+        # Award holders
+        self.longest_road_holder = None  # Player number
+        self.largest_army_holder = None  # Player number
+        
+        # Game state
+        self.winner = None  # Player number of winner (if game ended)
+    
+    def recalculate_victory_points(self):
+        """
+        CRITICAL: Recalculate all VP after ANY VP-generating event
+        Called after: settlement, city, road placement, soldier/sheriff play, VP card play
+        """
+        # Step 1: Calculate base VP for all players
+        for player in self.players.values():
+            player.calculate_vp()
+        
+        # Step 2: Check for award transfers
+        self._check_longest_road_award()
+        self._check_largest_army_award()
+        
+        # Step 3: Recalculate total VP for anyone affected by award transfers
+        for player in self.players.values():
+            player.calculate_vp()
+        
+        # Step 4: Check win condition
+        for player_num, player in self.players.items():
+            if player.total_vp >= self.win_condition_vp:
+                self.winner = player_num
+                print(f"\n🏆 GAME OVER! Player {player_num} wins with {player.total_vp} VP!")
+                return True
+        
+        return False  # Game continues
+    
+    def _check_longest_road_award(self):
+        """Check if Longest Road award should be transferred"""
+        # Use longest roads data if available (set by renderer)
+        if not hasattr(self, 'longest_roads'):
+            self.longest_roads = {i: 0 for i in range(1, 5)}
+        
+        # Find player with longest road (5+ minimum)
+        best_player = None
+        best_length = 4  # Must be 5+ to qualify
+        
+        for player_num in range(1, 5):
+            length = self.longest_roads.get(player_num, 0)
+            if length >= 5 and length > best_length:
+                best_player = player_num
+                best_length = length
+        
+        # Handle award transfer
+        if best_player != self.longest_road_holder:
+            # Remove award from previous holder
+            if self.longest_road_holder is not None:
+                print(f"  Player {self.longest_road_holder} loses Longest Road award (-2 VP)")
+                self.players[self.longest_road_holder].holds_longest_road = False
+            
+            # Award to new holder
+            if best_player is not None:
+                print(f"  Player {best_player} wins Longest Road award (+2 VP, {best_length} roads)")
+                self.players[best_player].holds_longest_road = True
+            
+            self.longest_road_holder = best_player
+    
+    def _check_largest_army_award(self):
+        """Check if Largest Army award should be transferred"""
+        # Find player with most soldiers (3+ minimum)
+        best_player = None
+        best_soldiers = 2  # Must be 3+ to qualify
+        
+        for player_num, player in self.players.items():
+            total_soldiers = player.get_total_soldiers()
+            if total_soldiers >= 3 and total_soldiers > best_soldiers:
+                best_player = player_num
+                best_soldiers = total_soldiers
+        
+        # Handle award transfer
+        if best_player != self.largest_army_holder:
+            # Remove award from previous holder
+            if self.largest_army_holder is not None:
+                print(f"  Player {self.largest_army_holder} loses Largest Army award (-2 VP)")
+                self.players[self.largest_army_holder].holds_largest_army = False
+            
+            # Award to new holder
+            if best_player is not None:
+                print(f"  Player {best_player} wins Largest Army award (+2 VP, {best_soldiers} soldiers)")
+                self.players[best_player].holds_largest_army = True
+            
+            self.largest_army_holder = best_player
     
     def render_ascii(self):
         """Show ASCII board representation"""
         self.board.show_board()
     
-    def get_board_data(self) -> Dict:
+    def place_settlement(self, player_number: int, vertex_id: str):
+        """Place a settlement and trigger VP recalculation"""
+        self.players[player_number].settlements[vertex_id] = None
+        print(f"Player {player_number} placed settlement at {vertex_id}")
+        return self.recalculate_victory_points()
+    
+    def upgrade_to_city(self, player_number: int, vertex_id: str):
+        """Upgrade settlement to city and trigger VP recalculation"""
+        if vertex_id in self.players[player_number].settlements:
+            del self.players[player_number].settlements[vertex_id]
+            self.players[player_number].cities[vertex_id] = None
+            print(f"Player {player_number} upgraded settlement to city at {vertex_id}")
+            return self.recalculate_victory_points()
+    
+    def place_road(self, player_number: int, edge_id: str):
+        """Place a road and trigger VP recalculation (for longest road award)"""
+        self.players[player_number].roads[edge_id] = None
+        print(f"Player {player_number} placed road at {edge_id}")
+        return self.recalculate_victory_points()
+    
+    def play_soldier_card(self, player_number: int):
+        """Play a soldier card and trigger VP recalculation (for largest army award)"""
+        self.players[player_number].soldiers += 1
+        print(f"Player {player_number} played soldier card ({self.players[player_number].soldiers} total)")
+        return self.recalculate_victory_points()
+    
+    def play_sheriff_card(self, player_number: int):
+        """Play a sheriff card (counts as 2 soldiers) and trigger VP recalculation"""
+        self.players[player_number].sheriff_played = True
+        print(f"Player {player_number} played sheriff card (counts as 2 soldiers)")
+        return self.recalculate_victory_points()
+    
+    def play_vp_card(self, player_number: int, card_type: str):
+        """
+        Play a VP development card and trigger recalculation
+        card_type: 'university', 'brothel', 'market', 'library', 'great_hall', 'chapel'
+        """
+        if card_type in self.players[player_number].vp_cards_face_down:
+            self.players[player_number].vp_cards_face_down[card_type] -= 1
+            self.players[player_number].vp_cards_face_up[card_type] += 1
+            value = Player.VP_CARD_VALUES[card_type]
+            print(f"Player {player_number} played {card_type} card (+{value} VP)")
+            return self.recalculate_victory_points()
+    
+    def play_decoy_as_vp(self, player_number: int):
+        """Play 3 face-down decoy cards as 1 VP"""
+        if self.players[player_number].decoys_face_down >= 3:
+            self.players[player_number].decoys_face_down -= 3
+            self.players[player_number].decoys_face_up += 3  # Turn them face up to mark played
+            print(f"Player {player_number} played 3 decoy cards as 1 VP")
+            return self.recalculate_victory_points()
+    
+    def set_longest_road_length(self, player_number: int, length: int):
+        """
+        Called by renderer to update longest road length for a player
+        This allows game logic to check for longest road award transfers
+        """
+        # Store longest road length temporarily for award checking
+        # This will be used in _check_longest_road_award()
+        if not hasattr(self, 'longest_roads'):
+            self.longest_roads = {}
+        self.longest_roads[player_number] = length
         """Get board data for rendering"""
         return {
             'map_name': self.map_name,

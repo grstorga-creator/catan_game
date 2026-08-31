@@ -320,8 +320,9 @@ class PlacementPalette:
                            visited_edges: set, coming_from_edge_id: str) -> int:
         """
         Try to extend the path from a vertex.
-        The path can only continue if there's exactly ONE unvisited connected road.
-        If there are 0 or 2+ unvisited roads, the path ends (either terminus or branch).
+        The path can only continue if there's exactly ONE viable connected road.
+        A road is "viable" if it doesn't immediately lead to an opponent's settlement/city.
+        If there are 0 or 2+ viable unvisited roads, the path ends (either terminus or branch).
         """
         # Check if this vertex is blocked by opponent settlement/city
         if vertex_id in self.settlements and self.settlements[vertex_id] != player:
@@ -341,25 +342,42 @@ class PlacementPalette:
             
             # Check if this edge connects to our vertex
             if edge.vertex1 and edge.vertex1.vertex_id == vertex_id:
-                connected_roads.append(edge_id)
+                connected_roads.append((edge_id, edge.vertex2.vertex_id))  # (edge_id, other_vertex_id)
             elif edge.vertex2 and edge.vertex2.vertex_id == vertex_id:
-                connected_roads.append(edge_id)
+                connected_roads.append((edge_id, edge.vertex1.vertex_id))  # (edge_id, other_vertex_id)
         
-        print(f"[ROAD EXT] Vertex {vertex_id}: found {len(connected_roads)} unvisited connected roads: {connected_roads}")
+        print(f"[ROAD EXT] Vertex {vertex_id}: found {len(connected_roads)} unvisited connected roads")
         
-        # Path can only continue if there's EXACTLY ONE unvisited connected road
-        if len(connected_roads) == 0:
-            print(f"[ROAD EXT] Vertex {vertex_id}: dead end (0 roads)")
+        # Filter out roads that immediately lead to opponent settlements/cities (dead ends)
+        viable_roads = []
+        for edge_id, other_vertex_id in connected_roads:
+            is_blocked = False
+            if other_vertex_id in self.settlements and self.settlements[other_vertex_id] != player:
+                print(f"[ROAD EXT]   {edge_id} blocked: opponent settlement at {other_vertex_id}")
+                is_blocked = True
+            elif other_vertex_id in self.cities and self.cities[other_vertex_id] != player:
+                print(f"[ROAD EXT]   {edge_id} blocked: opponent city at {other_vertex_id}")
+                is_blocked = True
+            
+            if not is_blocked:
+                viable_roads.append(edge_id)
+                print(f"[ROAD EXT]   {edge_id} viable (leads to {other_vertex_id})")
+        
+        print(f"[ROAD EXT] Vertex {vertex_id}: {len(viable_roads)} viable roads after filtering")
+        
+        # Path can only continue if there's EXACTLY ONE viable unvisited connected road
+        if len(viable_roads) == 0:
+            print(f"[ROAD EXT] Vertex {vertex_id}: dead end (0 viable roads)")
             return 0  # Dead end
-        elif len(connected_roads) == 1:
-            # Continue on the only connected road
-            next_edge_id = connected_roads[0]
+        elif len(viable_roads) == 1:
+            # Continue on the only viable connected road
+            next_edge_id = viable_roads[0]
             print(f"[ROAD EXT] Vertex {vertex_id}: continuing to {next_edge_id}")
             # Don't add to visited here - let _longest_unbranched_path do it
             return self._longest_unbranched_path(next_edge_id, player, board, visited_edges, vertex_id)
         else:
-            # len(connected_roads) >= 2 - this is a branch point!
-            print(f"[ROAD EXT] Vertex {vertex_id}: BRANCH POINT ({len(connected_roads)} roads) - stopping")
+            # len(viable_roads) >= 2 - this is a real branch point!
+            print(f"[ROAD EXT] Vertex {vertex_id}: BRANCH POINT ({len(viable_roads)} viable roads) - stopping")
             return 0  # Path branches here, can't continue
         """Calculate minimum edge distance between two vertices"""
         if v1_id == v2_id:
